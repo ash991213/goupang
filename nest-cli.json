@@ -81,6 +81,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/shipment/tsconfig.app.json"
       }
+    },
+    "noti": {
+      "type": "application",
+      "root": "apps/noti",
+      "entryFile": "main",
+      "sourceRoot": "apps/noti/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/noti/tsconfig.app.json"
+      }
     }
   }
 }
