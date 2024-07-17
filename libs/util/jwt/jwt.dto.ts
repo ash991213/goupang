@@ -1,5 +1,5 @@
 import { Expose, Type } from 'class-transformer';
-import { IsEnum, IsInstance, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsInstance, IsNumber, IsString, IsNotEmpty } from 'class-validator';
 
 import { JWT_TYPE } from '@libs/util/const/enum.const';
 
@@ -7,6 +7,7 @@ export class JwtDto {
     @Expose({ name: 'id' })
     @Type(() => Number)
     @IsNumber()
+    @IsNotEmpty()
     id: number;
 
     @Expose({ name: 'iat' })
