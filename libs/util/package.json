@@ -1,0 +1,18 @@
+{
+    "name": "@libs/util",
+    "version": "0.0.1",
+    "description": "common util",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": {
+        "name": "An Suhwan",
+        "email": "ansuhwan215@gmail.com"
+    },
+    "license": "ISC",
+    "dependencies": {
+        "luxon": "^3.4.4"
+    }
+}
