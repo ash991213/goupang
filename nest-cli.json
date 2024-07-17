@@ -72,6 +72,15 @@
       "compilerOptions": {
         "tsConfigPath": "apps/auth/tsconfig.app.json"
       }
+    },
+    "shipment": {
+      "type": "application",
+      "root": "apps/shipment",
+      "entryFile": "main",
+      "sourceRoot": "apps/shipment/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/shipment/tsconfig.app.json"
+      }
     }
   }
 }
