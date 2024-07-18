@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { IEnvConfigService } from '@libs/module/config/adapter';
 import { EnvConfigService } from '@libs/module/config/service';
 
+// TODO : provide, useClass 수정
 @Module({})
 export class EnvConfigModule {
     static forRoot(additionalEnvPaths: string[] = [], ICLS, CLS): DynamicModule {
