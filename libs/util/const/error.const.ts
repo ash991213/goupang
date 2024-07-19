@@ -9,6 +9,8 @@ export const NOT_HAVE_ACCESS: Res = { code: 4, message: '접근 권한이 없습
 export const BAD_GATEWAY: Res = { code: 5, message: '요청 리소스에 연결할 수 없습니다.' };
 export const GATEWAY_TIMEOUT: Res = { code: 6, message: '요청 시간이 초과 되었습니다.' };
 export const UNAUTHORIZED_ERROR: Res = { code: 7, message: '인증되지 않은 요청입니다.' };
+export const USER_HEADER_NOT_FOUND: Res = { code: 8, message: '회원 헤더를 찾을 수 없습니다.' };
+export const INVALID_HEADER_USER_ID: Res = { code: 9, message: '회원 헤더의 유저 ID가 유효하지 않습니다.' };
 
 // * database
 export const DB_CONNECTION_FAILED: Res = { code: 1001, message: '데이터베이스에 연결을 실패하였습니다.' };
