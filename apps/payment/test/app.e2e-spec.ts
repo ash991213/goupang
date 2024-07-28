@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { PaymentModule } from '@apps/payment/src/payment.module';
+import { PaymentModule } from '@apps/payment/src/payment/payment.module';
 
 describe('PaymentController (e2e)', () => {
     let app: INestApplication;
