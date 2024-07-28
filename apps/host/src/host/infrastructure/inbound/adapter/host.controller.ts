@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { HostService } from '@apps/host/src/host.service';
+import { HostService } from '@apps/host/src/host/infrastructure/inbound/port/host.service';
 
 @Controller()
 export class HostController {
