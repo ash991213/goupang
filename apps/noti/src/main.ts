@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { NotiModule } from '@apps/noti/src/noti.module';
+import { NotiModule } from '@apps/noti/src/noti/noti.module';
 
 async function bootstrap() {
     const app = await NestFactory.create(NotiModule);

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { NotiModule } from '@apps/noti/src/noti.module';
+import { NotiModule } from '@apps/noti/src/noti/noti.module';
 
 describe('NotiController (e2e)', () => {
     let app: INestApplication;
