@@ -96,7 +96,11 @@ importers:
 
   apps/auth: {}
 
-  apps/host: {}
+  apps/host:
+    dependencies:
+      typeorm:
+        specifier: ^0.3.20
+        version: 0.3.20(ts-node@10.9.2)
 
   apps/noti: {}
 
