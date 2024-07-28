@@ -18,7 +18,7 @@ export class ProductEntity {
     product_content: string;
 
     @Column({ type: 'decimal', comment: '상품 가격', nullable: false })
-    product_price: string;
+    product_price: number;
 
     @Column({ type: 'int', comment: '상품 재고', nullable: false })
     product_stock: string;
