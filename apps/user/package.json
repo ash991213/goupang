@@ -12,6 +12,7 @@
         "email": "ansuhwan215@gmail.com"
     },
     "license": "MIT",
-    "dependencies": {},
-    "devDependencies": {}
+    "dependencies": {
+        "typeorm": "^0.3.20"
+    }
 }
