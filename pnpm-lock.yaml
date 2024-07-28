@@ -102,7 +102,11 @@ importers:
         specifier: ^0.3.20
         version: 0.3.20(ts-node@10.9.2)
 
-  apps/noti: {}
+  apps/noti:
+    dependencies:
+      typeorm:
+        specifier: ^0.3.20
+        version: 0.3.20(ts-node@10.9.2)
 
   apps/order: {}
 
