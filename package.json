@@ -21,6 +21,7 @@
         "host": "pnpm --filter ./apps/host",
         "noti": "pnpm --filter ./apps/noti",
         "order": "pnpm --filter ./apps/order",
+        "payment": "pnpm --filter ./apps/payment",
         "product": "pnpm --filter ./apps/product",
         "user": "pnpm --filter ./apps/user",
         "module": "pnpm --filter ./libs/module",
