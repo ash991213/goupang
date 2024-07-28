@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { ShipmentService } from '@apps/shipment/src/shipment.service';
+import { ShipmentService } from '@apps/shipment/src/shipment/infrastructure/inbound/port/shipment.service';
 
 @Controller()
 export class ShipmentController {
