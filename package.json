@@ -23,6 +23,7 @@
         "order": "pnpm --filter ./apps/order",
         "payment": "pnpm --filter ./apps/payment",
         "product": "pnpm --filter ./apps/product",
+        "shipment": "pnpm --filter ./apps/shipment",
         "user": "pnpm --filter ./apps/user",
         "module": "pnpm --filter ./libs/module",
         "util": "pnpm --filter ./libs/util"

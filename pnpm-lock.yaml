@@ -122,7 +122,11 @@ importers:
         specifier: ^0.3.20
         version: 0.3.20(ts-node@10.9.2)
 
-  apps/shipment: {}
+  apps/shipment:
+    dependencies:
+      typeorm:
+        specifier: ^0.3.20
+        version: 0.3.20(ts-node@10.9.2)
 
   apps/user:
     dependencies:
