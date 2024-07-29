@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { OrderEntity } from '@apps/order/src/order/domain/entity';
 
 @Entity({ name: 'order_payment' })
 export class OrderPaymentEntity {
@@ -25,4 +26,8 @@ export class OrderPaymentEntity {
 
     @Column({ type: 'varchar', comment: '결제 ID', length: 128, default: null, nullable: true })
     payment_transaction_id: string;
+
+    @ManyToOne(() => OrderEntity, (order) => order.order_payment_entity)
+    @JoinColumn({ name: 'order_id', referencedColumnName: 'order_id' })
+    order_entity: OrderEntity;
 }

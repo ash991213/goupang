@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { OrderEntity } from '@apps/order/src/order/domain/entity';
 
 @Entity({ name: 'order_product' })
 export class OrderProductEntity {
@@ -25,4 +26,8 @@ export class OrderProductEntity {
 
     @Column({ type: 'int', comment: '상품 수량', nullable: false })
     product_quantity: number;
+
+    @ManyToOne(() => OrderEntity, (order) => order.order_product_entity)
+    @JoinColumn({ name: 'order_id', referencedColumnName: 'order_id' })
+    order_entity: OrderEntity;
 }

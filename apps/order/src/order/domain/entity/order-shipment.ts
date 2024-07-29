@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { OrderEntity } from '@apps/order/src/order/domain/entity';
 
 @Entity({ name: 'order_shipment' })
 export class OrderShipmentEntity {
@@ -19,4 +20,8 @@ export class OrderShipmentEntity {
 
     @Column({ type: 'varchar', comment: '배송 ID', length: 128, default: null, nullable: true })
     shipment_transaction_id: string;
+
+    @ManyToOne(() => OrderEntity, (order) => order.order_shipment_entity)
+    @JoinColumn({ name: 'order_id', referencedColumnName: 'order_id' })
+    order_entity: OrderEntity;
 }
