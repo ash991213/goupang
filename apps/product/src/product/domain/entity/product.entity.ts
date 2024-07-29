@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { PRODUCT_STATUS } from '@apps/product/src/product/domain/enum/product.enum';
 
 @Entity({ name: 'product' })
 export class ProductEntity {
@@ -24,7 +25,7 @@ export class ProductEntity {
     product_stock: string;
 
     @Column({ type: 'enum', comment: '상품 상태', nullable: false })
-    product_status;
+    product_status: PRODUCT_STATUS;
 
     @Column({ type: 'int', comment: '상품 리뷰 수', nullable: false })
     review_count: number;

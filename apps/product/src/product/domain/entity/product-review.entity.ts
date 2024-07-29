@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { REVIEW_STATUS } from '@apps/product/src/product/domain/enum/product.enum';
 
 @Entity({ name: 'product_review' })
 export class ProductReviewEntity {
@@ -21,7 +22,7 @@ export class ProductReviewEntity {
     review_score: number;
 
     @Column({ type: 'enum', comment: '리뷰 상태', nullable: false })
-    review_status;
+    review_status: REVIEW_STATUS;
 
     @CreateDateColumn({ type: 'datetime', comment: '생성 시간', nullable: false })
     created_at: Date;
