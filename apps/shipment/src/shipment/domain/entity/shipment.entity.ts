@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { SHIPMENT_STATUS } from '@apps/shipment/src/shipment/domain/enum/shipment.enum';
 
 @Entity({ name: 'shipment' })
 export class ShipmentEntity {
@@ -9,7 +10,7 @@ export class ShipmentEntity {
     shipment_address: string;
 
     @Column({ type: 'enum', comment: '배송 상태', nullable: false })
-    shipment_status;
+    shipment_status: SHIPMENT_STATUS;
 
     @Column({ type: 'varchar', comment: '배송지 실패 시 사유', length: 300, default: null, nullable: true })
     shipment_message: string;
