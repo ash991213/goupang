@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { PAYMENT_STATUS } from '@apps/payment/src/payment/domain/enum/payment.enum';
 
 @Entity({ name: 'payment' })
 export class PaymentEntity {
@@ -18,7 +19,7 @@ export class PaymentEntity {
     payment_price: number;
 
     @Column({ type: 'enum', comment: '결제 상태', nullable: false })
-    payment_status;
+    payment_status: PAYMENT_STATUS;
 
     @Column({ type: 'varchar', comment: '결제 메시지', length: 300, default: null, nullable: true })
     payment_message: string;
