@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { ORDER_STATUS } from '@apps/order/src/order/domain/enum/order.enum';
 
 @Entity({ name: 'order' })
 export class OrderEntity {
@@ -21,7 +22,7 @@ export class OrderEntity {
     order_price: number;
 
     @Column({ type: 'enum', comment: '주문 상태', nullable: false })
-    order_status;
+    order_status: ORDER_STATUS;
 
     @CreateDateColumn({ type: 'datetime', comment: '생성 시간', nullable: false })
     created_at: Date;
