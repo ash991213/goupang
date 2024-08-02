@@ -7,12 +7,16 @@
     "license": "UNLICENSED",
     "scripts": {
         "build": "nest build",
-        "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
+        "build:user:dev": "cross-env NODE_ENV=dev nest build user",
+        "build:user:test": "cross-env NODE_ENV=test nest build user",
+        "build:user:prod": "cross-env NODE_ENV=prod nest build user",
         "start": "nest start",
+        "start:user:dev": "cross-env NODE_ENV=dev nest start user",
+        "start:user:test": "cross-env NODE_ENV=test node dist/apps/user/main",
+        "start:user:prod": "cross-env NODE_ENV=dev node dist/apps/user/main",
         "start:dev": "nest start --watch",
         "start:debug": "nest start --debug --watch",
         "start:prod": "node dist/apps/goupang/main",
-        "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
         "test": "jest",
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
@@ -26,7 +30,9 @@
         "shipment": "pnpm --filter ./apps/shipment",
         "user": "pnpm --filter ./apps/user",
         "module": "pnpm --filter ./libs/module",
-        "util": "pnpm --filter ./libs/util"
+        "util": "pnpm --filter ./libs/util",
+        "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+        "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\""
     },
     "dependencies": {
         "@nestjs/common": "^10.0.0",
@@ -34,6 +40,7 @@
         "@nestjs/platform-express": "^10.0.0",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.14.1",
+        "cross-env": "^7.0.3",
         "reflect-metadata": "^0.1.13",
         "rxjs": "^7.8.1"
     },
