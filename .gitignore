@@ -1,7 +1,6 @@
-# compiled output
+# dependencies
 /dist
 /node_modules
-/*/*/node_modules
 
 # OS
 .DS_Store
@@ -11,6 +10,3 @@
 
 # IDE - VSCode
 .vscode
-
-# dotenv environment variable files
-/*/*/*/env
