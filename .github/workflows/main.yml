@@ -30,14 +30,14 @@ jobs:
               id: changes
               with:
                   filters: |
-                      auth: apps/src/auth
-                      host: apps/src/host
-                      noti: apps/src/noti
-                      order: apps/src/order
-                      payment: apps/src/payment
-                      product: apps/src/product
-                      shipment: apps/src/shipment
-                      user: apps/src/user
+                      auth: apps/auth
+                      host: apps/host
+                      noti: apps/noti
+                      order: apps/order
+                      payment: apps/payment
+                      product: apps/product
+                      shipment: apps/shipment
+                      user: apps/user
 
     auth:
         if: needs.files-changed.outputs.auth == 'true'
