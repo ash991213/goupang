@@ -32,8 +32,12 @@ jobs:
                       shipment: apps/src/shipment
                       user: apps/src/user
 
+            - name: Debug output
+              run: echo "Changed packages: ${{ steps.filter.outputs.changes }}"
+
     build:
         needs: changes
+        if: ${{ fromJSON(needs.changes.outputs.packages) != '[]' }}
         strategy:
             matrix:
                 package: ${{ fromJSON(needs.changes.outputs.packages) }}
