@@ -17,21 +17,21 @@ jobs:
             packages: ${{ steps.filter.outputs.changes }}
         steps:
             - name: Checkout repository
-                uses: actions/checkout@v4
+              uses: actions/checkout@v4
 
             - name: Filter changed paths
-                id: filter
-                uses: dorny/paths-filter@v3
-                with:
-                    filters: |
-                        auth: apps/src/auth
-                        host: apps/src/host
-                        noti: apps/src/noti
-                        order: apps/src/order
-                        payment: apps/src/payment
-                        product: apps/src/product
-                        shipment: apps/src/shipment
-                        user: apps/src/user
+              id: filter
+              uses: dorny/paths-filter@v3
+              with:
+                  filters: |
+                      auth: apps/src/auth
+                      host: apps/src/host
+                      noti: apps/src/noti
+                      order: apps/src/order
+                      payment: apps/src/payment
+                      product: apps/src/product
+                      shipment: apps/src/shipment
+                      user: apps/src/user
 
     build:
         needs: changes
@@ -41,34 +41,34 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
-                uses: actions/checkout@v4
+              uses: actions/checkout@v4
 
             - name: Set up Docker Buildx
-                uses: docker/setup-buildx-action@v2
+              uses: docker/setup-buildx-action@v2
 
             - name: Log in to Amazon ECR
-                uses: aws-actions/amazon-ecr-login@v1
-                with:
-                    region: ap-northeast-2
+              uses: aws-actions/amazon-ecr-login@v1
+              with:
+                  region: ap-northeast-2
 
             - name: Extract project name
-                id: extract_project
-                run: echo "::set-output name=project::${{ matrix.package }}"
+              id: extract_project
+              run: echo "::set-output name=project::${{ matrix.package }}"
 
             - name: Build Docker image
-                run: |
-                    export REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/${{ steps.extract_project.outputs.project }}
-                    export IMAGE_TAG=latest
-                    docker build --no-cache --build-arg APP_ENV=${{ steps.extract_project.outputs.project }} --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/${{ steps.extract_project.outputs.project }}/Dockerfile ./${{ matrix.package }}
+              run: |
+                  export REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/${{ steps.extract_project.outputs.project }}
+                  export IMAGE_TAG=latest
+                  docker build --no-cache --build-arg APP_ENV=${{ steps.extract_project.outputs.project }} --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/${{ steps.extract_project.outputs.project }}/Dockerfile ./${{ matrix.package }}
 
             - name: Push Docker image to ECR
-                run: |
-                    export REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/${{ steps.extract_project.outputs.project }}
-                    export IMAGE_TAG=latest
-                    aws ecr create-repository --repository-name $REPO_NAME || true
-                    docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                    docker push $REPO_NAME:$IMAGE_TAG
-                env:
-                    AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              run: |
+                  export REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/${{ steps.extract_project.outputs.project }}
+                  export IMAGE_TAG=latest
+                  aws ecr create-repository --repository-name $REPO_NAME || true
+                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
+                  docker push $REPO_NAME:$IMAGE_TAG
+              env:
+                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
