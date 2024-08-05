@@ -39,6 +39,17 @@ jobs:
                       shipment: apps/shipment
                       user: apps/user
 
+            - name: Debug paths-filter output
+              run: |
+                  echo "Auth changed: ${{ steps.changes.outputs.auth }}"
+                  echo "Host changed: ${{ steps.changes.outputs.host }}"
+                  echo "Noti changed: ${{ steps.changes.outputs.noti }}"
+                  echo "Order changed: ${{ steps.changes.outputs.order }}"
+                  echo "Payment changed: ${{ steps.changes.outputs.payment }}"
+                  echo "Product changed: ${{ steps.changes.outputs.product }}"
+                  echo "Shipment changed: ${{ steps.changes.outputs.shipment }}"
+                  echo "User changed: ${{ steps.changes.outputs.user }}"
+
     auth:
         if: needs.files-changed.outputs.auth == 'true'
         needs: files-changed
