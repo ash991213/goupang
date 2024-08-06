@@ -30,14 +30,14 @@ jobs:
               id: changes
               with:
                   filters: |
-                      auth: apps/auth
-                      host: apps/host
-                      noti: apps/noti
-                      order: apps/order
-                      payment: apps/payment
-                      product: apps/product
-                      shipment: apps/shipment
-                      user: apps/user
+                      auth: apps/auth/**
+                      host: apps/host/**
+                      noti: apps/noti/**
+                      order: apps/order/**
+                      payment: apps/payment/**
+                      product: apps/product/**
+                      shipment: apps/shipment/**
+                      user: apps/user/**
 
             - name: Debug paths-filter output
               run: |
