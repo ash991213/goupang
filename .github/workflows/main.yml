@@ -350,14 +350,20 @@ jobs:
         name: Build and push user Docker image
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+            - name: Checkout repo
+              uses: actions/checkout@v3
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  role-to-assume: arn:aws:iam::123456789012:role/my-github-actions-role
+                  aws-region: ap-northeast-2
 
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v2
 
             - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v1
+              uses: aws-actions/amazon-ecr-login@v2
               with:
                   region: ap-northeast-2
 
@@ -368,7 +374,6 @@ jobs:
                   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  AWS_DEFAULT_REGION: ap-northeast-2
 
             - name: Build Docker image for user
               run: |
@@ -386,7 +391,6 @@ jobs:
                   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  AWS_DEFAULT_REGION: ap-northeast-2
 
     # build:
     #     needs: changes
