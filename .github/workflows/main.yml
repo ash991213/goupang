@@ -83,39 +83,19 @@ jobs:
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-            - name: Extract metadata (tags, labels) from Docker
-              id: metadata
-              uses: docker/metadata-action@v4
-              with:
-                  images: apps/user
+            - name: Build Docker image for user
+              run: |
+                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
+                  IMAGE_TAG=latest
+                  docker build --no-cache --build-arg APP_ENV=user --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/user/Dockerfile ./apps/user
 
-            - name: Build and push Docker image
-              uses: docker/build-push-action@v4
-              with:
-                  context: .
-                  push: true
-                  tags: ${{ steps.metadata.outputs.tags }}
-                  labels: ${{ steps.metadata.outputs.labels }}
-                  build-args: |
-                      "NODE_ENV=prod"
-                      "APP_ENV=user"
-
-            #       REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
-            #       IMAGE_TAG=latest
-
-            # - name: Build Docker image for user
-            #   run: |
-            #       REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
-            #       IMAGE_TAG=latest
-            #       docker build --no-cache --build-arg APP_ENV=user --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/user/Dockerfile ./apps/user
-
-            # - name: Push Docker image to ECR
-            #   run: |
-            #       REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
-            #       IMAGE_TAG=latest
-            #       docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-            #       docker push $REPO_NAME:$IMAGE_TAG
-            #   env:
-            #       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-            #       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            #       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            - name: Push Docker image to ECR
+              run: |
+                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
+                  IMAGE_TAG=latest
+                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
+                  docker push $REPO_NAME:$IMAGE_TAG
+              env:
+                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
