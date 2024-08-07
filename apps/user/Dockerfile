@@ -4,6 +4,7 @@ RUN npm i -g pnpm
 
 ADD . /app
 ADD . /app/apps/user
+ADD . /app/libs
 
 WORKDIR /app
 
