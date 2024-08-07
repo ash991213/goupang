@@ -12,6 +12,8 @@ ARG APP_ENV
 ARG NODE_ENV
 ENV NODE_ENV=${NODE_ENV}
 
+COPY . .
+
 RUN pnpm run build:${APP_ENV}:${NODE_ENV}
 
 COPY apps/user/package.json dist/apps/user/
@@ -21,10 +23,6 @@ COPY libs/module/ libs/module/
 COPY libs/util/ libs/util/
 
 WORKDIR /app
-
-RUN pnpm --prefix dist/apps/user install
-RUN pnpm --prefix libs/module install
-RUN pnpm --prefix libs/util install
 
 RUN ls /app -al
 

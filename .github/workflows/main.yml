@@ -367,7 +367,7 @@ jobs:
               uses: docker/setup-buildx-action@v2
 
             - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v1
+              uses: aws-actions/amazon-ecr-login@v2
 
             - name: Create ECR repository for user
               run: |
@@ -393,36 +393,3 @@ jobs:
                   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-    # build:
-    #     needs: changes
-    #     if: ${{ fromJson(needs.changes.outputs.projects) != '[]' }}
-    #     strategy:
-    #         matrix:
-    #             package: ${{ fromJson(needs.changes.outputs.projects) }}
-    #     runs-on: ubuntu-20.04
-    #     steps:
-    #         - name: Checkout repository
-    #           uses: actions/checkout@v4
-
-    #         - name: Set up Docker Buildx
-    #           uses: docker/setup-buildx-action@v2
-
-    #         - name: Log in to Amazon ECR
-    #           uses: aws-actions/amazon-ecr-login@v1
-    #           with:
-    #               region: ap-northeast-2
-
-    #         - name: Build Docker image
-    #           run: |
-    #               for package in ${{ fromJson(needs.changes.outputs.projects) }}; do
-    #                   export REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/$package
-    #                   export IMAGE_TAG=latest
-    #                   docker build --no-cache --build-arg APP_ENV=$package --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/$package/Dockerfile ./apps/$package
-    #                   docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-    #                   docker push $REPO_NAME:$IMAGE_TAG
-    #               done
-    #           env:
-    #               AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-    #               AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #               AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
