@@ -1,6 +1,6 @@
 FROM node:18-alpine AS base
 
-RUN npm i -g pnpm 
+RUN npm i -g pnpm
 
 ADD . /app
 
@@ -14,13 +14,14 @@ ENV NODE_ENV=${NODE_ENV}
 
 COPY . .
 
+RUN pnpm i
+
 RUN pnpm run build:${APP_ENV}:${NODE_ENV}
 
-COPY apps/user/package.json dist/apps/user/
-COPY apps/user/tsconfig.build.json dist/apps/user/
-COPY apps/user/tsconfig.json dist/apps/user/
-COPY libs/module/ libs/module/
-COPY libs/util/ libs/util/
+COPY ./package.json dist/apps/user/
+COPY ./tsconfig.build.json dist/apps/user/
+COPY ./tsconfig.json dist/apps/user/
+COPY ../../libs/ libs/
 
 WORKDIR /app
 
