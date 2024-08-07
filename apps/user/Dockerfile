@@ -3,6 +3,7 @@ FROM node:18-alpine AS base
 RUN npm i -g pnpm
 
 ADD . /app
+ADD . /app/apps/user
 
 WORKDIR /app
 
@@ -13,7 +14,7 @@ ARG NODE_ENV
 ENV APP_ENV=${APP_ENV}
 ENV NODE_ENV=${NODE_ENV}
 
-COPY ./** ./apps/user
+COPY . ./apps/user
 COPY ../../libs/** ./libs
 COPY ../../tsconfig.json .
 COPY ../../package.json .
