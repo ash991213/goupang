@@ -10,18 +10,17 @@ RUN ls /app -al
 
 ARG APP_ENV
 ARG NODE_ENV
+ENV APP_ENV=${APP_ENV}
 ENV NODE_ENV=${NODE_ENV}
 
-COPY . .
+COPY ./user/** ./apps/user
+COPY ../../libs/** ./libs
+COPY ../../tsconfig.json .
+COPY ../../package.json .
 
 RUN pnpm i
 
 RUN pnpm run build:${APP_ENV}:${NODE_ENV}
-
-COPY ./package.json dist/apps/user/
-COPY ./tsconfig.build.json dist/apps/user/
-COPY ./tsconfig.json dist/apps/user/
-# COPY ../../libs libs/
 
 WORKDIR /app
 
