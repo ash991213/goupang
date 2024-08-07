@@ -13,7 +13,7 @@ ARG NODE_ENV
 ENV APP_ENV=${APP_ENV}
 ENV NODE_ENV=${NODE_ENV}
 
-COPY ./user/** ./apps/user
+COPY ./** ./apps/user
 COPY ../../libs/** ./libs
 COPY ../../tsconfig.json .
 COPY ../../package.json .
