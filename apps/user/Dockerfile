@@ -21,7 +21,7 @@ RUN pnpm run build:${APP_ENV}:${NODE_ENV}
 COPY ./package.json dist/apps/user/
 COPY ./tsconfig.build.json dist/apps/user/
 COPY ./tsconfig.json dist/apps/user/
-COPY ../../libs/ libs/
+COPY ../../libs libs/
 
 WORKDIR /app
 
