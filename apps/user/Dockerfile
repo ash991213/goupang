@@ -12,7 +12,7 @@ ARG APP_ENV
 ARG NODE_ENV
 ENV NODE_ENV=${NODE_ENV}
 
-COPY ../../ .
+COPY . .
 
 RUN pnpm i
 
