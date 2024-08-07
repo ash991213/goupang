@@ -54,300 +54,6 @@ jobs:
                   echo "Shipment changed: ${{ steps.changes.outputs.shipment }}"
                   echo "User changed: ${{ steps.changes.outputs.user }}"
 
-    auth:
-        if: needs.files-changed.outputs.auth == 'true'
-        needs: files-changed
-        name: Build and push auth Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v1
-              with:
-                  region: ap-northeast-2
-
-            - name: Create ECR repository for auth
-              run: |
-                  aws ecr create-repository --repository-name goupang/auth || true
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-            - name: Build Docker image for auth
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/auth
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=auth --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/auth/Dockerfile ./apps/auth
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/auth
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-    host:
-        if: needs.files-changed.outputs.host == 'true'
-        needs: files-changed
-        name: Build and push host Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v1
-              with:
-                  region: ap-northeast-2
-
-            - name: Create ECR repository for host
-              run: |
-                  aws ecr create-repository --repository-name goupang/host || true
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-            - name: Build Docker image for host
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/host
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=host --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/host/Dockerfile ./apps/host
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/host
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-    noti:
-        if: needs.files-changed.outputs.noti == 'true'
-        needs: files-changed
-        name: Build and push noti Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v1
-              with:
-                  region: ap-northeast-2
-
-            - name: Create ECR repository for noti
-              run: |
-                  aws ecr create-repository --repository-name goupang/noti || true
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-            - name: Build Docker image for noti
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/noti
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=noti --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/noti/Dockerfile ./apps/noti
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/noti
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-    order:
-        if: needs.files-changed.outputs.order == 'true'
-        needs: files-changed
-        name: Build and push order Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v1
-              with:
-                  region: ap-northeast-2
-
-            - name: Create ECR repository for order
-              run: |
-                  aws ecr create-repository --repository-name goupang/order || true
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-            - name: Build Docker image for order
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/order
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=order --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/order/Dockerfile ./apps/order
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/order
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-    payment:
-        if: needs.files-changed.outputs.payment == 'true'
-        needs: files-changed
-        name: Build and push payment Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v1
-              with:
-                  region: ap-northeast-2
-
-            - name: Create ECR repository for payment
-              run: |
-                  aws ecr create-repository --repository-name goupang/payment || true
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-            - name: Build Docker image for payment
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/payment
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=payment --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/payment/Dockerfile ./apps/payment
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/payment
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-    product:
-        if: needs.files-changed.outputs.product == 'true'
-        needs: files-changed
-        name: Build and push product Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v1
-              with:
-                  region: ap-northeast-2
-
-            - name: Create ECR repository for product
-              run: |
-                  aws ecr create-repository --repository-name goupang/product || true
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-            - name: Build Docker image for product
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/product
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=product --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/product/Dockerfile ./apps/product
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/product
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-    shipment:
-        if: needs.files-changed.outputs.shipment == 'true'
-        needs: files-changed
-        name: Build and push shipment Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v1
-              with:
-                  region: ap-northeast-2
-
-            - name: Create ECR repository for shipment
-              run: |
-                  aws ecr create-repository --repository-name goupang/shipment || true
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-            - name: Build Docker image for shipment
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/shipment
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=shipment --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/shipment/Dockerfile ./apps/shipment
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/shipment
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
     user:
         if: needs.files-changed.outputs.user == 'true'
         needs: files-changed
@@ -377,19 +83,39 @@ jobs:
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-            - name: Build Docker image for user
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=user --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/user/Dockerfile ./apps/user
+            - name: Extract metadata (tags, labels) from Docker
+              id: metadata
+              uses: docker/metadata-action@v4
+              with:
+                  images: apps/user/Dockerfile
 
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v4
+              with:
+                  context: .
+                  push: true
+                  tags: ${{ steps.metadata.outputs.tags }}
+                  labels: ${{ steps.metadata.outputs.labels }}
+                  build-args: |
+                      "NODE_ENV=prod"
+                      "APP_ENV=user"
+
+            #       REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
+            #       IMAGE_TAG=latest
+
+            # - name: Build Docker image for user
+            #   run: |
+            #       REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
+            #       IMAGE_TAG=latest
+            #       docker build --no-cache --build-arg APP_ENV=user --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/user/Dockerfile ./apps/user
+
+            # - name: Push Docker image to ECR
+            #   run: |
+            #       REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
+            #       IMAGE_TAG=latest
+            #       docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
+            #       docker push $REPO_NAME:$IMAGE_TAG
+            #   env:
+            #       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+            #       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            #       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
