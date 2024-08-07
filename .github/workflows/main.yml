@@ -87,7 +87,7 @@ jobs:
               run: |
                   REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
                   IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=user --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/user/Dockerfile ./apps/user
+                  docker build --no-cache --build-arg APP_ENV=user --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/user/Dockerfile .
 
             - name: Push Docker image to ECR
               run: |
