@@ -87,7 +87,7 @@ jobs:
               id: metadata
               uses: docker/metadata-action@v4
               with:
-                  images: apps/user/Dockerfile
+                  images: apps/user
 
             - name: Build and push Docker image
               uses: docker/build-push-action@v4
