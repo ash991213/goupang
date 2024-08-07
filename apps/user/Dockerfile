@@ -16,7 +16,7 @@ ENV APP_ENV=${APP_ENV}
 ENV NODE_ENV=${NODE_ENV}
 
 COPY . ./apps/user
-COPY ../../libs/ ./libs
+COPY ../../libs/ ./apps/user
 COPY ../../tsconfig.json .
 COPY ../../package.json .
 
