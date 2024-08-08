@@ -98,10 +98,18 @@ jobs:
                   docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
                   docker push $REPO_NAME:$IMAGE_TAG
 
+            - name: Create deployment package
+              run: |
+                  mkdir -p deployment_package/scripts
+                  cp apps/user/appspec.yml deployment_package/
+                  cp apps/user/scripts/pull_and_run.sh deployment_package/scripts/
+                  cd deployment_package
+                  zip -r ../deployment_package.zip .
+                  cd ..
+
             - name: Upload to S3
               run: |
-                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} apps/user/appspec.yml s3://$S3_BUCKET_NAME/user/appspec.yml
-                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} apps/user/scripts/pull_and_run.sh s3://$S3_BUCKET_NAME/user/scripts/pull_and_run.sh --acl bucket-owner-full-control
+                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} deployment_package.zip s3://$S3_BUCKET_NAME/user/deployment_package.zip
 
             - name: Deploy to CodeDeploy
               run: |
@@ -109,4 +117,4 @@ jobs:
                   --deployment-config-name CodeDeployDefault.AllAtOnce \
                   --application-name ${{ env.USER_APPLICATION_NAME }} \
                   --deployment-group-name ${{ env.USER_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-                  --s3-location "bucket=$S3_BUCKET_NAME,key=user/appspec.yml,bundleType=yml"
+                  --s3-location "bucket=$S3_BUCKET_NAME,key=user/deployment_package.zip,bundleType=zip"
