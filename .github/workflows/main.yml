@@ -107,8 +107,8 @@ jobs:
 
             - name: Upload to S3
               run: |
-                  aws s3 cp apps/user/appspec.yml s3://$S3_BUCKET_NAME/appspec.yml
-                  aws s3 cp apps/user/scripts/pull_and_run.sh s3://$S3_BUCKET_NAME/apps/user/scripts/pull_and_run.sh
+                  aws s3 cp --region ${{ secrets.AWS_DEFAULT_REGION }} apps/user/appspec.yml s3://$S3_BUCKET_NAME/appspec.yml
+                  aws s3 cp --region ${{ secrets.AWS_DEFAULT_REGION }} apps/user/scripts/pull_and_run.sh s3://$S3_BUCKET_NAME/apps/user/scripts/pull_and_run.sh
 
             - name: Deploy to CodeDeploy
               run: |
