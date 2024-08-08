@@ -107,7 +107,7 @@ jobs:
 
             - name: Upload to S3
               run: |
-                  aws s3 cp --region ${{ secrets.AWS_DEFAULT_REGION }} apps/user/appspec.yml s3://$S3_BUCKET_NAME/appspec.yml
+                  aws s3 cp --region ${{ secrets.AWS_DEFAULT_REGION }} apps/user/appspec.yml s3://goupang-deploy-s3/user/appspec.yml
               env:
                   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
