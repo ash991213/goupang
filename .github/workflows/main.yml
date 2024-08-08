@@ -11,6 +11,11 @@ permissions:
     id-token: write
     contents: read
 
+env:
+    S3_BUCKET_NAME: goupang-deploy-s3
+    USER_APPLICATION_NAME: goupang-user
+    USER_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-user
+
 jobs:
     files-changed:
         name: detect what files changed
@@ -99,3 +104,17 @@ jobs:
                   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+            - name: Upload to S3
+              run: |
+                  aws s3 cp apps/user/appspec.yml s3://$S3_BUCKET_NAME/appspec.yml
+                  aws s3 cp apps/user/scripts/pull_and_run.sh s3://$S3_BUCKET_NAME/apps/user/scripts/pull_and_run.sh
+
+            - name: Deploy to CodeDeploy
+              run: |
+                  aws deploy create-deployment \
+                  --deployment-config-name CodeDeployDefault.AllAtOnce \
+                  --application-name ${{ env.USER_APPLICATION_NAME }} \
+                  --deployment-group-name ${{ env.USER_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }}
+                  --s3-location bucket=$S3_BUCKET_NAME,key=apps/user/appspec.yml,bundleType=yml
+                  --file-exists-behavior OVERWRITE
