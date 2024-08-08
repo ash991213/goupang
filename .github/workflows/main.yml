@@ -13,6 +13,7 @@ permissions:
 
 env:
     S3_BUCKET_NAME: goupang-deploy-s3
+    AWS_DEFAULT_REGION: ap-northeast-2
     USER_APPLICATION_NAME: goupang-user
     USER_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-user
 
@@ -72,7 +73,7 @@ jobs:
               uses: aws-actions/configure-aws-credentials@v4
               with:
                   role-to-assume: ${{ secrets.AWS_ROLE_NAME }}
-                  aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+                  aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v2
@@ -83,10 +84,6 @@ jobs:
             - name: Create ECR repository for user
               run: |
                   aws ecr create-repository --repository-name goupang/user || true
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
             - name: Build Docker image for user
               run: |
@@ -100,18 +97,10 @@ jobs:
                   IMAGE_TAG=latest
                   docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
                   docker push $REPO_NAME:$IMAGE_TAG
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
             - name: Upload to S3
               run: |
-                  aws s3 cp --region ${{ secrets.AWS_DEFAULT_REGION }} apps/user/appspec.yml s3://goupang-deploy-s3/user/appspec.yml
-              env:
-                  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} apps/user/appspec.yml s3://$S3_BUCKET_NAME/user/appspec.yml
 
             - name: Deploy to CodeDeploy
               run: |
@@ -122,4 +111,4 @@ jobs:
                   --s3-location bucket=$S3_BUCKET_NAME,key=apps/user/appspec.yml,bundleType=yml
                   --file-exists-behavior OVERWRITE
 
-# aws s3 cp --region ${{ secrets.AWS_DEFAULT_REGION }} apps/user/scripts/pull_and_run.sh s3://$S3_BUCKET_NAME/scripts/pull_and_run.sh --acl bucket-owner-full-control
+# aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} apps/user/scripts/pull_and_run.sh s3://$S3_BUCKET_NAME/scripts/pull_and_run.sh --acl bucket-owner-full-control
