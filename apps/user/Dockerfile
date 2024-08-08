@@ -22,6 +22,8 @@ COPY ../../package.json .
 
 RUN pnpm i
 
+RUN pnpm user i
+
 RUN pnpm run build:${APP_ENV}:${NODE_ENV}
 
 WORKDIR /app
