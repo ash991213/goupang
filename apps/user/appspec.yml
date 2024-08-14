@@ -13,6 +13,6 @@ permissions:
 
 hooks:
     ApplicationStart:
-        - location: goupang-user/scripts/pull_and_run.sh
+        - location: scripts/pull_and_run.sh
           timeout: 60
           runas: ubuntu
