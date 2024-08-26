@@ -113,7 +113,7 @@ jobs:
                   cp apps/user/docker-compose.yml deployment_package/
                   cp apps/user/nginx.conf deployment_package/
                   cp -r apps/user/db deployment_package/
-                  cp apps/user/env/.env.prod deployment_package/env/.env.prod
+                  cp apps/user/env/.env.prod deployment_package/env/
                   cd deployment_package
                   zip -r ../deployment_package.zip .
                   cd ..
