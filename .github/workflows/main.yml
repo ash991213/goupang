@@ -112,7 +112,7 @@ jobs:
                   cp apps/user/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/user/docker-compose.yml deployment_package/
                   cp apps/user/nginx.conf deployment_package/
-                  cp apps/user/db deployment_package/db
+                  cp -r apps/user/db deployment_package/
                   cp apps/user/env/.env.prod deployment_package/env/.env.prod
                   cd deployment_package
                   zip -r ../deployment_package.zip .
