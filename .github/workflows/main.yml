@@ -98,6 +98,13 @@ jobs:
                   docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
                   docker push $REPO_NAME:$IMAGE_TAG
 
+            - name: Create .env.prod file
+              run: |
+                  echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> apps/user/env/.env.prod
+                  echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> apps/user/env/.env.prod
+                  echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> apps/user/env/.env.prod
+                  echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> apps/user/env/.env.prod
+
             - name: Create deployment package
               run: |
                   mkdir -p deployment_package/scripts
@@ -106,7 +113,7 @@ jobs:
                   cp apps/user/docker-compose.yml deployment_package/
                   cp apps/user/nginx.conf deployment_package/
                   cp apps/user/db deployment_package/db
-                  cp apps/user/env deployment_package/env
+                  cp apps/user/env/.env.prod deployment_package/env/.env.prod
                   cd deployment_package
                   zip -r ../deployment_package.zip .
                   cd ..
