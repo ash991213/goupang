@@ -3,3 +3,9 @@
 
 # dotenv environment variable files
 /env
+
+# nginx configuration
+nginx.conf
+
+# db configuration
+/db
