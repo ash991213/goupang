@@ -1,26 +1,20 @@
 #!/bin/bash
 
-set -e
-set -x
+ENV_FILE="./env/.env.dev"
 
-echo "Starting AWS ECR login..."
-aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 262872842537.dkr.ecr.ap-northeast-2.amazonaws.com
-echo "AWS ECR login completed."
+PROJECT_NAME="goupang-user"
 
-echo "Stopping existing goupang-user container if it exists..."
-docker stop goupang-user || true
-echo "Existing goupang-user container stopped."
+SERVICES=("master-node" "slave-node1" "slave-node2" "goupang-user" "nginx")
 
-echo "Removing existing goupang-user container if it exists..."
-docker rm goupang-user || true
-echo "Existing goupang-user container removed."
+RUNNING_CONTAINERS=$(docker ps --format '{{.Names}}')
 
-echo "Pulling the latest Docker image from ECR..."
-docker pull 262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user:latest
-echo "Docker image pull completed."
+CMD="docker-compose --env-file $ENV_FILE -p $PROJECT_NAME up -d"
 
-echo "Running the Docker container goupang-user..."
-docker run -d --name goupang-user -p 8000:8000 262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user:latest
-echo "Docker container goupang-user is now running."
+for SERVICE in "${SERVICES[@]}"; do
+    if [[ "$SERVICE" == "goupang-user" || ! $RUNNING_CONTAINERS =~ $SERVICE ]]; then
+        CMD+=" $SERVICE"
+    fi
+done
 
-echo "Script execution completed successfully."
+echo "Executing command: $CMD"
+eval $CMD

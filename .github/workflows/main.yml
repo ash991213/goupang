@@ -103,6 +103,10 @@ jobs:
                   mkdir -p deployment_package/scripts
                   cp apps/user/appspec.yml deployment_package/
                   cp apps/user/scripts/pull_and_run.sh deployment_package/scripts/
+                  cp apps/user/docker-compose.yml deployment_package/
+                  cp apps/user/nginx.conf deployment_package/
+                  cp apps/user/db deployment_package/db
+                  cp apps/user/env deployment_package/env
                   cd deployment_package
                   zip -r ../deployment_package.zip .
                   cd ..
