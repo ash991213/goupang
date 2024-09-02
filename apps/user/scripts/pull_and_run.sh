@@ -20,13 +20,13 @@ for service in "${SERVICES[@]}"; do
         echo "Updating $SERVICE_NAME with the latest image."
         docker pull $IMAGE_NAME
 
-        docker-compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d --force-recreate $SERVICE_NAME
+        docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d --force-recreate $SERVICE_NAME
     else
         if docker ps --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
             echo "Service $service is already running. Skipping."
         else
             echo "Service $service is not running. Starting."
-            docker-compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d $service
+            docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d $service
         fi
     fi
 done
