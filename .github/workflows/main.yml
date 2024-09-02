@@ -108,6 +108,7 @@ jobs:
             - name: Create deployment package
               run: |
                   mkdir -p deployment_package/scripts
+                  mkdir -p deployment_package/env
                   cp apps/user/appspec.yml deployment_package/
                   cp apps/user/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/user/docker-compose.yml deployment_package/
