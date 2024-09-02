@@ -1,24 +1,23 @@
 #!/bin/bash
 
-ENV_FILE="/home/ubuntu/goupang-user/env/.env.prod"
-DOCKER_COMPOSE_FILE="/home/ubuntu/goupang-user/docker-compose.yml"
-IMAGE_NAME="262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user:latest"
+SERVICE_NAME="goupang-user"
+ENV_FILE="/home/ubuntu/$SERVICE_NAME/env/.env.prod"
+DOCKER_COMPOSE_FILE="/home/ubuntu/$SERVICE_NAME/docker-compose.yml"
+IMAGE_PATH="262872842537.dkr.ecr.ap-northeast-2.amazonaws.com"
+IMAGE_NAME="$IMAGE_PATH/goupang/user:latest"
 
-PROJECT_NAME="goupang-user"
+LOGIN_CMD="aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $IMAGE_PATH"
 
-SERVICES=("master-node" "slave-node1" "slave-node2" "goupang-user" "nginx")
+if docker ps --format '{{.Names}}' | grep -q "^$SERVICE_NAME$"; then
+    echo "Container $SERVICE_NAME exists. Pulling the latest image and restarting the service."
 
-RUNNING_CONTAINERS=$(docker ps --format '{{.Names}}')
+    eval $LOGIN_CMD
 
-docker pull $IMAGE_NAME
+    docker pull $IMAGE_NAME
 
-CMD="docker-compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $PROJECT_NAME up -d"
+    docker-compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d $SERVICE_NAME
+else
+    echo "Container $SERVICE_NAME does not exist. Bringing up all services."
 
-for SERVICE in "${SERVICES[@]}"; do
-    if [[ "$SERVICE" == "goupang-user" || ! $RUNNING_CONTAINERS =~ $SERVICE ]]; then
-        CMD+=" $SERVICE"
-    fi
-done
-
-echo "Executing command: $CMD"
-eval $CMD
+    docker-compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d
+fi
