@@ -100,6 +100,7 @@ jobs:
 
             - name: Create .env.prod file
               run: |
+                  echo "" > apps/user/env/.env.prod
                   echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> apps/user/env/.env.prod
                   echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> apps/user/env/.env.prod
                   echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> apps/user/env/.env.prod
