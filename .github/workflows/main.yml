@@ -100,11 +100,13 @@ jobs:
 
             - name: Create .env.prod file
               run: |
-                  echo "" > apps/user/env/.env.prod
-                  echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> apps/user/env/.env.prod
-                  echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> apps/user/env/.env.prod
-                  echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> apps/user/env/.env.prod
-                  echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> apps/user/env/.env.prod
+                  {
+                    echo ""
+                    echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
+                    echo "MYSQL_USER=${{ secrets.MYSQL_USER }}"
+                    echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}"
+                    echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}"
+                  } >> apps/user/env/.env.prod
 
             - name: Create deployment package
               run: |
