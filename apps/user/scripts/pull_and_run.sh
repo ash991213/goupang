@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ENV_FILE="./env/.env.dev"
+ENV_FILE="./env/.env.prod"
 
 PROJECT_NAME="goupang-user"
 
