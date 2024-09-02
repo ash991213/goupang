@@ -80,8 +80,8 @@ services:
             - net
         environment:
             - TZ=Asia/Seoul
-        depends_on:
-            - goupang-user
+        # depends_on:
+        #     - goupang-user
 
 volumes:
     master-node:
