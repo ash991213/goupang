@@ -10,22 +10,39 @@ IMAGE_NAME="$IMAGE_PATH/goupang/user:latest"
 
 LOGIN_CMD="aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $IMAGE_PATH"
 
+eval $LOGIN_CMD
+
+echo "Pulling the latest image for $SERVICE_NAME..."
+docker pull $IMAGE_NAME
+
 for service in "${SERVICES[@]}"; do
-
     CONTAINER_NAME="${service}"
-    
+
     if [ "$service" == "$SERVICE_NAME" ]; then
-        eval $LOGIN_CMD
+        echo "Updating $SERVICE_NAME to use the latest image."
 
-        echo "Updating $SERVICE_NAME with the latest image."
-        docker pull $IMAGE_NAME
+        if docker ps -a --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
+            if docker ps --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
+                echo "Stopping running container $CONTAINER_NAME..."
+                docker stop $CONTAINER_NAME
+            fi
 
-        docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d --force-recreate $SERVICE_NAME
+            echo "Removing old container $CONTAINER_NAME..."
+            docker rm $CONTAINER_NAME
+        fi
+
+        echo "Starting $SERVICE_NAME with the latest image..."
+        docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d $SERVICE_NAME
     else
-        if docker ps --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
-            echo "Service $service is already running. Skipping."
+        if docker ps -a --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
+            if ! docker ps --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
+                echo "Service $service is not running. Restarting."
+                docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d --force-recreate $service
+            else
+                echo "Service $service is already running. Skipping."
+            fi
         else
-            echo "Service $service is not running. Starting."
+            echo "Service $service is not present. Starting."
             docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d $service
         fi
     fi
