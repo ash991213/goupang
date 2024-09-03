@@ -27,25 +27,23 @@ for service in "${SERVICES[@]}"; do
                 docker stop $CONTAINER_NAME
             fi
 
-docker ps -a --format '{{.Names}}' | grep "goupang"
-
             echo "Removing old container $CONTAINER_NAME..."
             docker rm $CONTAINER_NAME
         fi
 
         echo "Starting $SERVICE_NAME with the latest image..."
-        docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE pull -p $SERVICE_NAME up -d $SERVICE_NAME --build
+        docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE pull up -d $SERVICE_NAME --build
     else
         if docker ps -a --format '{{.Names}}' | grep $CONTAINER_NAME; then
             if ! docker ps --format '{{.Names}}' | grep $CONTAINER_NAME; then
                 echo "Service $service is not running. Restarting."
-                docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d --force-recreate $service
+                docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE up -d --force-recreate $service
             else
                 echo "Service $service is already running. Skipping."
             fi
         else
             echo "Service $service is not present. Starting."
-            docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d $service --build
+            docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE up -d $service --build
         fi
     fi
 done

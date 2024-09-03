@@ -1,7 +1,7 @@
 services:
     master-node:
-        image: mysql:8.0.29
         container_name: master-node
+        image: mysql:8.0.29
         restart: always
         environment:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -18,8 +18,8 @@ services:
             - net
 
     slave-node1:
-        image: mysql:8.0.29
         container_name: slave-node1
+        image: mysql:8.0.29
         restart: always
         environment:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -36,8 +36,8 @@ services:
             - net
 
     slave-node2:
-        image: mysql:8.0.29
         container_name: slave-node2
+        image: mysql:8.0.29
         restart: always
         environment:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -54,8 +54,8 @@ services:
             - net
 
     goupang-user:
-        image: 262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user:latest
         container_name: goupang-user
+        image: 262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user:latest
         restart: always
         ports:
             - '8000:8000'
