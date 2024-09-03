@@ -8,12 +8,12 @@ DOCKER_COMPOSE_FILE="/home/ubuntu/$SERVICE_NAME/docker-compose.yml"
 IMAGE_PATH="262872842537.dkr.ecr.ap-northeast-2.amazonaws.com"
 IMAGE_NAME="$IMAGE_PATH/goupang/user:latest"
 
-LOGIN_CMD="aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $IMAGE_PATH"
+# LOGIN_CMD="aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $IMAGE_PATH"
 
-eval $LOGIN_CMD
+# eval $LOGIN_CMD
 
-echo "Pulling the latest image for $SERVICE_NAME..."
-docker pull $IMAGE_NAME
+# echo "Pulling the latest image for $SERVICE_NAME..."
+# docker pull $IMAGE_NAME
 
 for service in "${SERVICES[@]}"; do
     CONTAINER_NAME="${service}"
@@ -32,7 +32,7 @@ for service in "${SERVICES[@]}"; do
         fi
 
         echo "Starting $SERVICE_NAME with the latest image..."
-        docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d $SERVICE_NAME
+        docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE pull -p $SERVICE_NAME up -d $SERVICE_NAME --build
     else
         if docker ps -a --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
             if ! docker ps --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
@@ -43,7 +43,7 @@ for service in "${SERVICES[@]}"; do
             fi
         else
             echo "Service $service is not present. Starting."
-            docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d $service
+            docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d $service --build
         fi
     fi
 done
