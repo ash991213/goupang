@@ -8,12 +8,7 @@ DOCKER_COMPOSE_FILE="/home/ubuntu/$SERVICE_NAME/docker-compose.yml"
 IMAGE_PATH="262872842537.dkr.ecr.ap-northeast-2.amazonaws.com"
 IMAGE_NAME="$IMAGE_PATH/goupang/user:latest"
 
-# LOGIN_CMD="aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $IMAGE_PATH"
-
-# eval $LOGIN_CMD
-
-# echo "Pulling the latest image for $SERVICE_NAME..."
-# docker pull $IMAGE_NAME
+LOGIN_CMD="aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $IMAGE_PATH"
 
 for service in "${SERVICES[@]}"; do
     CONTAINER_NAME="${service}"
@@ -31,8 +26,12 @@ for service in "${SERVICES[@]}"; do
             docker rm $CONTAINER_NAME
         fi
 
+        eval $LOGIN_CMD
+
+        echo "Pulling the latest image for $SERVICE_NAME..."
+        docker pull $IMAGE_NAME
+
         echo "Starting $SERVICE_NAME with the latest image..."
-        docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE pull $SERVICE_NAME
         docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE up -d --build
     else
         if docker ps -a --format '{{.Names}}' | grep $CONTAINER_NAME; then
