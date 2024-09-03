@@ -21,11 +21,13 @@ for service in "${SERVICES[@]}"; do
     if [ "$service" == "$SERVICE_NAME" ]; then
         echo "Updating $SERVICE_NAME to use the latest image."
 
-        if docker ps -a --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
-            if docker ps --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
+        if docker ps -a --format '{{.Names}}' | grep $CONTAINER_NAME; then
+            if docker ps --format '{{.Names}}' | grep $CONTAINER_NAME; then
                 echo "Stopping running container $CONTAINER_NAME..."
                 docker stop $CONTAINER_NAME
             fi
+
+docker ps -a --format '{{.Names}}' | grep "goupang"
 
             echo "Removing old container $CONTAINER_NAME..."
             docker rm $CONTAINER_NAME
@@ -34,8 +36,8 @@ for service in "${SERVICES[@]}"; do
         echo "Starting $SERVICE_NAME with the latest image..."
         docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE pull -p $SERVICE_NAME up -d $SERVICE_NAME --build
     else
-        if docker ps -a --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
-            if ! docker ps --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
+        if docker ps -a --format '{{.Names}}' | grep $CONTAINER_NAME; then
+            if ! docker ps --format '{{.Names}}' | grep $CONTAINER_NAME; then
                 echo "Service $service is not running. Restarting."
                 docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE -p $SERVICE_NAME up -d --force-recreate $service
             else
