@@ -61,10 +61,10 @@ services:
             - '8000:8000'
         networks:
             - net
-        # depends_on:
-        #     - master-node
-        #     - slave-node1
-        #     - slave-node2
+        depends_on:
+            - master-node
+            - slave-node1
+            - slave-node2
 
     nginx:
         container_name: nginx
@@ -79,8 +79,8 @@ services:
             - net
         environment:
             - TZ=Asia/Seoul
-        # depends_on:
-        #     - goupang-user
+        depends_on:
+            - goupang-user
 
 volumes:
     master-node:

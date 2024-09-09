@@ -7,8 +7,8 @@ import { EnvConfigService } from '@libs/module/config/service';
 // TODO : provide, useClass 수정
 @Module({})
 export class EnvConfigModule {
-    static forRoot(additionalEnvPaths: string[] = [], ICLS, CLS): DynamicModule {
-        const defaultEnvPath = `@libs/module/config/env/${process.env.NODE_ENV === 'prod' ? '.env.prod' : process.env.NODE_ENV === 'test' ? '.env.test' : '.env.dev'}`;
+    static forRoot(additionalEnvPaths: string[] = []): DynamicModule {
+        const defaultEnvPath = `libs/module/config/env/${process.env.NODE_ENV === 'prod' ? '.env.prod' : '.env.dev'}`;
         const envFilePaths = [defaultEnvPath, ...additionalEnvPaths];
 
         return {
@@ -25,10 +25,10 @@ export class EnvConfigModule {
                     provide: IEnvConfigService,
                     useClass: EnvConfigService,
                 },
-                {
-                    provide: ICLS,
-                    useClass: CLS,
-                },
+                // {
+                //     provide: ICLS,
+                //     useClass: CLS,
+                // },
             ],
             exports: [IEnvConfigService],
         };

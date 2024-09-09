@@ -29,7 +29,7 @@ export class EnvConfigService extends ConfigService implements IEnvConfigService
     };
 
     PORT = {
-        PRODUCT_PORT: this.get<number>('PRODUCT_PORT'),
+        PRODUCT_PORT: this.get<number>('PORT'),
     };
 
     RPC_URL = {

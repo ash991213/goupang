@@ -1,0 +1,21 @@
+{
+    "name": "@libs/modules",
+    "version": "0.0.1",
+    "description": "common module",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": {
+        "name": "An Suhwan",
+        "email": "ansuhwan215@gmail.com"
+    },
+    "license": "ISC",
+    "dependencies": {
+        "@nestjs/config": "^3.2.3",
+        "@nestjs/typeorm": "^10.0.2",
+        "luxon": "^3.4.4",
+        "typeorm": "^0.3.20"
+    }
+}
