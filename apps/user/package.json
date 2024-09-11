@@ -4,7 +4,8 @@
     "description": "shopping mall platform user service",
     "main": "index.js",
     "scripts": {
-        "test": "jest"
+        "test": "jest",
+        "test:coverage": "jest --coverage --detectOpenHandles --maxWorkers=50%"
     },
     "keywords": [],
     "author": {
