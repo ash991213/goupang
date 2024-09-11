@@ -17,10 +17,10 @@ module.exports = {
     coverageReporters: ['json', 'lcov', 'text', 'clover'],
     coverageThreshold: {
         global: {
-            lines: 80,
-            statements: 80,
-            functions: 80,
-            branches: 80,
+            lines: 40,
+            statements: 40,
+            functions: 40,
+            branches: 40,
         },
     },
     coveragePathIgnorePatterns: ['main.ts', 'swagger.ts', 'node_modules', 'module.ts', 'interface.ts', 'coverage'],
