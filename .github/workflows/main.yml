@@ -166,3 +166,20 @@ jobs:
               with:
                   name: test-coverage
                   path: apps/user/src/coverage
+
+    create-pull-request:
+        if: ${{ github.event_name =='push' && needs.user-tests.result == 'success' }}
+        needs: user-tests
+        name: Create Pull Request
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Create pull request
+              uses: thomaseizinger/create-pull-request@master
+              with:
+                  github_token: ${{secrets.CREATE_PULL_REQUEST_TOKEN}}
+                  head: ${{github.ref}}
+                  base: main
+                  title: 'An automatically created pull request'
