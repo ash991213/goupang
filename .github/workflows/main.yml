@@ -22,7 +22,6 @@ env:
 
 jobs:
     files-changed:
-        if: ${{ github.event_name == 'pull_request' }}
         name: detect what files changed
         runs-on: ubuntu-20.04
         timeout-minutes: 3
@@ -139,7 +138,8 @@ jobs:
                   --s3-location "bucket=$S3_BUCKET_NAME,key=user/deployment_package.zip,bundleType=zip"
 
     user-tests:
-        if: ${{ github.event_name == 'push' }}
+        if: ${{ github.event_name == 'push' && needs.files-changed.outputs.user == 'true' }}
+        needs: files-changed
         name: Run Jest Tests
         runs-on: ubuntu-latest
         steps:
