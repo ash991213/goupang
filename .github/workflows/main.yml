@@ -168,8 +168,8 @@ jobs:
                   path: apps/user/src/coverage
 
     create-pull-request:
-        if: ${{ github.event_name =='push' && needs.user-tests.result == 'success' }}
-        needs: user-tests
+        if: ${{ github.event_name =='push' && needs.files-changed.outputs.user == 'true'}}
+        needs: files-changed
         name: Create Pull Request
         runs-on: ubuntu-latest
         steps:
