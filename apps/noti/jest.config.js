@@ -8,7 +8,7 @@ module.exports = {
     preset: 'ts-jest',
 
     moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
-        prefix: '<rootDir>/../',
+        prefix: '<rootDir>/../../../',
     }),
 
     collectCoverage: true,
