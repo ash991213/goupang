@@ -1,0 +1,92 @@
+services:
+    master-node:
+        container_name: master-node
+        image: mysql:8.0.29
+        restart: always
+        environment:
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        ports:
+            - '3306:3306'
+        volumes:
+            - master-node:/var/lib/mysql
+            - master-node:/var/lib/mysql-files
+            - ./db/master-node/my.cnf:/etc/mysql/my.cnf
+        networks:
+            - net
+
+    slave-node1:
+        container_name: slave-node1
+        image: mysql:8.0.29
+        restart: always
+        environment:
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        ports:
+            - '3305:3306'
+        volumes:
+            - slave-node1:/var/lib/mysql
+            - slave-node1:/var/lib/mysql-files
+            - ./db/slave-node1/my.cnf:/etc/mysql/my.cnf
+        networks:
+            - net
+
+    slave-node2:
+        container_name: slave-node2
+        image: mysql:8.0.29
+        restart: always
+        environment:
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        ports:
+            - '3304:3306'
+        volumes:
+            - slave-node2:/var/lib/mysql
+            - slave-node2:/var/lib/mysql-files
+            - ./db/slave-node2/my.cnf:/etc/mysql/my.cnf
+        networks:
+            - net
+
+    goupang-noti:
+        container_name: goupang-noti
+        image: 262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/noti:latest
+        restart: always
+        ports:
+            - '8000:8000'
+        networks:
+            - net
+        depends_on:
+            - master-node
+            - slave-node1
+            - slave-node2
+
+    nginx:
+        container_name: nginx
+        image: nginx
+        restart: always
+        ports:
+            - '80:80/tcp'
+            - '443:443'
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf
+        networks:
+            - net
+        environment:
+            - TZ=Asia/Seoul
+        depends_on:
+            - goupang-noti
+
+volumes:
+    master-node:
+    slave-node1:
+    slave-node2:
+
+networks:
+    net:
+        driver: bridge
