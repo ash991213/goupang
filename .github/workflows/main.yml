@@ -183,3 +183,19 @@ jobs:
                   head: ${{github.ref}}
                   base: main
                   title: 'An automatically created pull request'
+                  body: |
+                      ## 🚀 Automated Pull Request
+
+                      This pull request was automatically created by the CI pipeline.
+
+                      ### ✅ Please Review & Approve
+                      - **Reviewers:** Your attention is required! 🙏
+                      - Merging requires at least **1 approvals**.
+
+                      ### 🔍 Changes Overview
+                      - [ ] Make sure all tests pass.
+                      - [ ] Review the code changes thoroughly.
+                      - [ ] Provide feedback if necessary.
+
+                      ### 📅 Reminder
+                      - This PR must remain open for at least **1 hour** before merging.
