@@ -197,5 +197,5 @@ jobs:
                       - [ ] Review the code changes thoroughly.
                       - [ ] Provide feedback if necessary.
 
-                      ### 📅 Reminder
-                      - This PR must remain open for at least **1 hour** before merging.
+                      ### 📢 Notification
+                      - A Slack message has been sent to the PR owner. 📬
