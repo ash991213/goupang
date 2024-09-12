@@ -65,7 +65,7 @@ jobs:
                   echo "User changed: ${{ steps.changes.outputs.user }}"
 
     user:
-        if: ${{ github.event_name == 'pull_request' && needs.files-changed.outputs.user == 'true' }}
+        if: ${{ needs.files-changed.outputs.user == 'true' && github.event.pull_request.merged == true }}
         needs: files-changed
         name: Build and push user Docker image
         runs-on: ubuntu-latest
@@ -169,7 +169,7 @@ jobs:
                   path: apps/user/src/coverage
 
     noti:
-        if: ${{ github.event_name == 'pull_request' && needs.files-changed.outputs.noti == 'true' }}
+        if: ${{ needs.files-changed.outputs.noti == 'true' && github.event.pull_request.merged == true }}
         needs: files-changed
         name: Build and push noti Docker image
         runs-on: ubuntu-latest
