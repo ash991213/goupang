@@ -4,6 +4,7 @@ on:
     push:
         branches-ignore:
             - main
+    pull_request_target:
 
 permissions:
     id-token: write
@@ -268,34 +269,74 @@ jobs:
                   name: test-coverage
                   path: apps/noti/src/coverage
 
-    # create-pull-request:
-    #     if: ${{ github.event_name == 'push' }}
-    #     name: Create Pull Request and Add Reviewers
+    create-pull-request:
+        if: ${{ github.event_name == 'push' }}
+        name: Create Pull Request and Add Reviewers
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Create pull request
+              uses: thomaseizinger/create-pull-request@master
+              with:
+                  github_token: ${{ secrets.CREATE_PULL_REQUEST_TOKEN }}
+                  head: ${{ github.ref }}
+                  base: main
+                  title: 'An automatically created pull request'
+                  body: |
+                      ## 🚀 자동 생성된 풀 리퀘스트
+
+                      이 풀 리퀘스트는 CI 파이프라인에 의해 자동으로 생성되었습니다.
+
+                      ### ✅ 검토 및 승인 요청
+                      - **리뷰어:** 확인이 필요합니다! 🙏
+                      - 병합하려면 최소 **1명의 승인**이 필요합니다.
+
+                      ### 🔍 변경 사항 개요
+                      - [ ] 모든 테스트가 통과하는지 확인하세요.
+                      - [ ] 코드 변경 사항을 철저히 검토하세요.
+                      - [ ] 필요에 따라 피드백을 제공하세요.
+
+                      ### 📢 알림
+                      - 풀 리퀘스트 담당자에게 슬랙 메시지가 전송되었습니다. 📬
+
+    set-reviewers:
+        name: Set reviewers
+        runs-on: ubuntu-latest
+        timeout-minutes: 1
+        steps:
+            - name: Set reviewers
+              uses: actions/github-script@v5
+              with:
+                  github-token: ${{secrets.CREATE_PULL_REQUEST_TOKEN}}
+                  script: |
+                      const reviewers = ["USER_1", "USER_2", "USER_3"];
+                      const actor = context.payload.pull_request.user.login;
+                      const { owner, repo } = context.repo;
+                      const prNumber = context.payload.pull_request.number;
+
+                      const { data: assignedReviewers } = await github.rest.pulls.listRequestedReviewers({
+                        owner,
+                        repo,
+                        pull_number: prNumber,
+                      });
+
+                      if (assignedReviewers.length === 0) {
+                        const filteredReviewers = reviewers.filter(reviewer => reviewer !== actor);
+                        const selectedReviewers = filteredReviewers.sort(() => Math.random() - 0.5).slice(0, 2);
+
+                        const prNumber = context.payload.pull_request.number;
+                        await github.rest.pulls.requestReviewers({
+                          owner,
+                          repo,
+                          pull_number: prNumber,
+                          reviewers: selectedReviewers
+                        });
+                      }
+
+    # add-assigners-and-reviews:
+    #     if: ${{ github.event_name == 'pull_request' && github.event.action == 'opened' || github.event.action == 'ready_for_review' }}
     #     runs-on: ubuntu-latest
     #     steps:
-    #         - name: Checkout repository
-    #           uses: actions/checkout@v3
-
-    #         - name: Create pull request
-    #           uses: thomaseizinger/create-pull-request@master
-    #           with:
-    #               github_token: ${{ secrets.CREATE_PULL_REQUEST_TOKEN }}
-    #               head: ${{ github.ref }}
-    #               base: main
-    #               title: 'An automatically created pull request'
-    #               body: |
-    #                   ## 🚀 자동 생성된 풀 리퀘스트
-
-    #                   이 풀 리퀘스트는 CI 파이프라인에 의해 자동으로 생성되었습니다.
-
-    #                   ### ✅ 검토 및 승인 요청
-    #                   - **리뷰어:** 확인이 필요합니다! 🙏
-    #                   - 병합하려면 최소 **1명의 승인**이 필요합니다.
-
-    #                   ### 🔍 변경 사항 개요
-    #                   - [ ] 모든 테스트가 통과하는지 확인하세요.
-    #                   - [ ] 코드 변경 사항을 철저히 검토하세요.
-    #                   - [ ] 필요에 따라 피드백을 제공하세요.
-
-    #                   ### 📢 알림
-    #                   - 풀 리퀘스트 담당자에게 슬랙 메시지가 전송되었습니다. 📬
+    #         - uses: kentaro-m/auto-assign-action@v2.0.0
