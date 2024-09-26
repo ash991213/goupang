@@ -2,7 +2,7 @@ addReviewers: true
 addAssignees: author
 
 reviewers:
-    - munak
+    - winterm1
     - ash991213
 
 numberOfReviewers: 1
