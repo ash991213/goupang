@@ -9,7 +9,7 @@ on:
 permissions:
     id-token: write
     contents: read
-    # pull-requests: write
+    pull-requests: write
 
 env:
     AWS_DEFAULT_REGION: ap-northeast-2
@@ -300,43 +300,3 @@ jobs:
 
                       ### 📢 알림
                       - 풀 리퀘스트 담당자에게 슬랙 메시지가 전송되었습니다. 📬
-
-    set-reviewers:
-        name: Set reviewers
-        runs-on: ubuntu-latest
-        timeout-minutes: 1
-        steps:
-            - name: Set reviewers
-              uses: actions/github-script@v5
-              with:
-                  github-token: ${{secrets.CREATE_PULL_REQUEST_TOKEN}}
-                  script: |
-                      const reviewers = ["USER_1", "USER_2", "USER_3"];
-                      const actor = context.payload.pull_request.user.login;
-                      const { owner, repo } = context.repo;
-                      const prNumber = context.payload.pull_request.number;
-
-                      const { data: assignedReviewers } = await github.rest.pulls.listRequestedReviewers({
-                        owner,
-                        repo,
-                        pull_number: prNumber,
-                      });
-
-                      if (assignedReviewers.length === 0) {
-                        const filteredReviewers = reviewers.filter(reviewer => reviewer !== actor);
-                        const selectedReviewers = filteredReviewers.sort(() => Math.random() - 0.5).slice(0, 2);
-
-                        const prNumber = context.payload.pull_request.number;
-                        await github.rest.pulls.requestReviewers({
-                          owner,
-                          repo,
-                          pull_number: prNumber,
-                          reviewers: selectedReviewers
-                        });
-                      }
-
-    # add-assigners-and-reviews:
-    #     if: ${{ github.event_name == 'pull_request' && github.event.action == 'opened' || github.event.action == 'ready_for_review' }}
-    #     runs-on: ubuntu-latest
-    #     steps:
-    #         - uses: kentaro-m/auto-assign-action@v2.0.0
