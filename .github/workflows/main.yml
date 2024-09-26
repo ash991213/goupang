@@ -4,10 +4,6 @@ on:
     push:
         branches-ignore:
             - main
-    pull_request:
-        types: [closed, ready_for_review]
-        branches:
-            - main
 
 permissions:
     id-token: write
@@ -303,13 +299,3 @@ jobs:
 
                       ### 📢 알림
                       - 풀 리퀘스트 담당자에게 슬랙 메시지가 전송되었습니다. 📬
-
-    add-reviewers-and-assignees:
-        if: ${{ github.event_name == 'pull_request' && github.event.action == 'opened' }}
-        runs-on: ubuntu-latest
-        steps:
-            - name: Add reviewers and assignees
-              uses: kentaro-m/auto-assign-action@v1.2.5
-              with:
-                  repo-token: ${{ secrets.CREATE_PULL_REQUEST_TOKEN }}
-                  configuration-path: '.github/auto_assign_config.yml'
