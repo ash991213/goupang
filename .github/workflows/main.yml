@@ -273,8 +273,8 @@ jobs:
                   path: apps/noti/src/coverage
 
     create-pull-request:
-        if: ${{ github.event_name =='push' }}
-        name: Create Pull Request
+        if: ${{ github.event_name == 'push' }}
+        name: Create Pull Request and Add Reviewers
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
@@ -283,8 +283,8 @@ jobs:
             - name: Create pull request
               uses: thomaseizinger/create-pull-request@master
               with:
-                  github_token: ${{secrets.CREATE_PULL_REQUEST_TOKEN}}
-                  head: ${{github.ref}}
+                  github_token: ${{ secrets.CREATE_PULL_REQUEST_TOKEN }}
+                  head: ${{ github.ref }}
                   base: main
                   title: 'An automatically created pull request'
                   body: |
@@ -305,7 +305,7 @@ jobs:
                       - 풀 리퀘스트 담당자에게 슬랙 메시지가 전송되었습니다. 📬
 
     add-reviewers-and-assignees:
-        if: ${{ github.event_name == 'pull_request' && github.event.action == 'ready_for_review' }}
+        if: ${{ github.event_name == 'pull_request' && github.event.action == 'opened' }}
         runs-on: ubuntu-latest
         steps:
             - name: Add reviewers and assignees
