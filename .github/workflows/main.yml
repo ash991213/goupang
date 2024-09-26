@@ -4,6 +4,8 @@ on:
     push:
         branches-ignore:
             - main
+    pull_request:
+        types: [opened, ready_for_review]
 
 permissions:
     id-token: write
@@ -267,6 +269,11 @@ jobs:
               with:
                   name: test-coverage
                   path: apps/noti/src/coverage
+
+    add-assigners-and-reviews:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: kentaro-m/auto-assign-action@v2.0.0
 
     # create-pull-request:
     #     if: ${{ github.event_name == 'push' }}
