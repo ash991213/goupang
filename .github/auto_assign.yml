@@ -1,8 +1,8 @@
 addReviewers: true
-numberOfReviewers: 1
+numberOfReviewers: 2
 addAssignees: author
 numberOfAssignees: 1
 
 reviewers:
-    # - ash991213
+    - ash991213
     - munak

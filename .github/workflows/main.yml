@@ -271,7 +271,7 @@ jobs:
 
     create-pull-request:
         if: ${{ github.event_name == 'push' }}
-        name: Create Pull Request and Add Reviewers
+        name: Create Pull Request
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
