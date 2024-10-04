@@ -21,7 +21,7 @@ describe('NotiController', () => {
     });
 
     it('should return "Noti Workflow Test!!"', () => {
-        expect(notiController.getHello()).toBe('Noti Workflow Test!');
+        expect(notiController.getHello()).toBe('Noti Workflow Test!!');
         expect(notiController.getHello()).toBe(notiService.getHello());
     });
 });
