@@ -33,6 +33,7 @@
         "product": "pnpm --filter ./apps/product",
         "shipment": "pnpm --filter ./apps/shipment",
         "user": "pnpm --filter ./apps/user",
+        "auth": "pnpm --filter ./apps/auth",
         "module": "pnpm --filter ./libs/module",
         "util": "pnpm --filter ./libs/util",
         "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
