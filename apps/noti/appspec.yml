@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
     - source: /
-      destination: /home/ubuntu/goupang-user
+      destination: /home/ubuntu/goupang-noti
       overwrite: yes
 
 permissions:
