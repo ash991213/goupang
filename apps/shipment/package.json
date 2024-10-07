@@ -4,7 +4,8 @@
     "description": "shopping mall platform shipment service",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "jest",
+        "test:coverage": "jest --coverage --detectOpenHandles --maxWorkers=50%"
     },
     "keywords": [],
     "author": {
