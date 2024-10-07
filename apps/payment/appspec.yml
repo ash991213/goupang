@@ -1,0 +1,18 @@
+version: 0.0
+os: linux
+files:
+    - source: /
+      destination: /home/ubuntu/goupang-payment
+      overwrite: yes
+
+permissions:
+    - object: /
+      pattern: '**'
+      owner: ubuntu
+      group: ubuntu
+
+hooks:
+    ApplicationStart:
+        - location: scripts/pull_and_run.sh
+          timeout: 60
+          runas: ubuntu
