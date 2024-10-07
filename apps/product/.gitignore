@@ -1,5 +1,14 @@
 # dependencies
-/node_modules
+node_modules
 
 # dotenv environment variable files
-/env
+env/.env.dev
+
+# nginx configuration
+# nginx.conf
+
+# db configuration
+# /db
+
+# test
+coverage
