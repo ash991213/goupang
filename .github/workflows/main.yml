@@ -22,6 +22,7 @@ env:
     USER_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-user
     NOTI_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-noti
     AUTH_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-auth
+    HOST_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-host
 
 jobs:
     files-changed:
@@ -483,7 +484,7 @@ jobs:
                   aws deploy create-deployment \
                   --deployment-config-name CodeDeployDefault.AllAtOnce \
                   --application-name ${{ env.CODE_DEPLOYMENT_NAME }} \
-                  --deployment-group-name ${{ env.AUTH_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+                  --deployment-group-name ${{ env.HOST_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
                   --s3-location "bucket=$S3_BUCKET_NAME,key=host/deployment_package.zip,bundleType=zip"
 
     create-pull-request:
