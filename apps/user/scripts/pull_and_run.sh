@@ -1,12 +1,10 @@
 #!/bin/bash
 
-SERVICES=("goupang-user" "master-node" "slave-node1" "slave-node2" "nginx")
+SERVICES=("goupang-user" "nginx")
 
 SERVICE_NAME="goupang-user"
 ENV_FILE="/home/ubuntu/$SERVICE_NAME/env/.env.prod"
-# ENV_FILE="./env/.env.prod"
 DOCKER_COMPOSE_FILE="/home/ubuntu/$SERVICE_NAME/docker-compose.yml"
-# DOCKER_COMPOSE_FILE="./docker-compose.yml"
 IMAGE_PATH="262872842537.dkr.ecr.ap-northeast-2.amazonaws.com"
 IMAGE_NAME="$IMAGE_PATH/goupang/user:latest"
 
