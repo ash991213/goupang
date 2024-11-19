@@ -158,7 +158,6 @@ jobs:
                   cp apps/user/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/user/docker-compose.yml deployment_package/
                   cp apps/user/nginx.conf deployment_package/
-                  cp -r apps/user/db deployment_package/
                   cp apps/user/env/.env.prod deployment_package/env/
                   cd deployment_package
                   zip -r ../deployment_package.zip .
@@ -263,7 +262,6 @@ jobs:
                   cp apps/noti/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/noti/docker-compose.yml deployment_package/
                   cp apps/noti/nginx.conf deployment_package/
-                  cp -r apps/noti/db deployment_package/
                   cp apps/noti/env/.env.prod deployment_package/env/
                   cd deployment_package
                   zip -r ../deployment_package.zip .
@@ -368,7 +366,6 @@ jobs:
                   cp apps/auth/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/auth/docker-compose.yml deployment_package/
                   cp apps/auth/nginx.conf deployment_package/
-                  cp -r apps/auth/db deployment_package/
                   cp apps/auth/env/.env.prod deployment_package/env/
                   cd deployment_package
                   zip -r ../deployment_package.zip .
@@ -473,7 +470,6 @@ jobs:
                   cp apps/host/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/host/docker-compose.yml deployment_package/
                   cp apps/host/nginx.conf deployment_package/
-                  cp -r apps/host/db deployment_package/
                   cp apps/host/env/.env.prod deployment_package/env/
                   cd deployment_package
                   zip -r ../deployment_package.zip .
@@ -578,7 +574,6 @@ jobs:
                   cp apps/order/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/order/docker-compose.yml deployment_package/
                   cp apps/order/nginx.conf deployment_package/
-                  cp -r apps/order/db deployment_package/
                   cp apps/order/env/.env.prod deployment_package/env/
                   cd deployment_package
                   zip -r ../deployment_package.zip .
@@ -683,7 +678,6 @@ jobs:
                   cp apps/payment/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/payment/docker-compose.yml deployment_package/
                   cp apps/payment/nginx.conf deployment_package/
-                  cp -r apps/payment/db deployment_package/
                   cp apps/payment/env/.env.prod deployment_package/env/
                   cd deployment_package
                   zip -r ../deployment_package.zip .
@@ -788,7 +782,6 @@ jobs:
                   cp apps/product/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/product/docker-compose.yml deployment_package/
                   cp apps/product/nginx.conf deployment_package/
-                  cp -r apps/product/db deployment_package/
                   cp apps/product/env/.env.prod deployment_package/env/
                   cd deployment_package
                   zip -r ../deployment_package.zip .
@@ -893,7 +886,6 @@ jobs:
                   cp apps/shipment/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/shipment/docker-compose.yml deployment_package/
                   cp apps/shipment/nginx.conf deployment_package/
-                  cp -r apps/shipment/db deployment_package/
                   cp apps/shipment/env/.env.prod deployment_package/env/
                   cd deployment_package
                   zip -r ../deployment_package.zip .

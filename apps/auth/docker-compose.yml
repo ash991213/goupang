@@ -1,24 +1,4 @@
 services:
-    redis-master:
-        image: redis:latest
-        container_name: redis-master
-        command: ['redis-server', '--appendonly', 'yes']
-        ports:
-            - '6379:6379'
-        volumes:
-            - redis-master-data:/data
-
-    redis-slave:
-        image: redis:latest
-        container_name: redis-slave
-        command: ['redis-server', '--slaveof', 'redis-master', '6379']
-        ports:
-            - '6380:6379'
-        depends_on:
-            - redis-master
-        volumes:
-            - redis-slave-data:/data
-
     goupang-auth:
         container_name: goupang-auth
         image: 262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/auth:latest
