@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVICES=("goupang-host" "master-node" "slave-node1" "slave-node2" "nginx")
+SERVICES=("goupang-host" "nginx")
 
 SERVICE_NAME="goupang-host"
 ENV_FILE="/home/ubuntu/$SERVICE_NAME/env/.env.prod"
