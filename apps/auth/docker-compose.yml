@@ -1,57 +1,23 @@
 services:
-    master-node:
-        container_name: master-node
-        image: mysql:8.0.29
-        restart: always
-        environment:
-            MYSQL_DATABASE: ${MYSQL_DATABASE}
-            MYSQL_USER: ${MYSQL_USER}
-            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    redis-master:
+        image: redis:latest
+        container_name: redis-master
+        command: ['redis-server', '--appendonly', 'yes']
         ports:
-            - '3306:3306'
+            - '6379:6379'
         volumes:
-            - master-node:/var/lib/mysql
-            - master-node:/var/lib/mysql-files
-            - ./db/master-node/my.cnf:/etc/mysql/my.cnf
-        networks:
-            - net
+            - redis-master-data:/data
 
-    slave-node1:
-        container_name: slave-node1
-        image: mysql:8.0.29
-        restart: always
-        environment:
-            MYSQL_DATABASE: ${MYSQL_DATABASE}
-            MYSQL_USER: ${MYSQL_USER}
-            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    redis-slave:
+        image: redis:latest
+        container_name: redis-slave
+        command: ['redis-server', '--slaveof', 'redis-master', '6379']
         ports:
-            - '3305:3306'
+            - '6380:6379'
+        depends_on:
+            - redis-master
         volumes:
-            - slave-node1:/var/lib/mysql
-            - slave-node1:/var/lib/mysql-files
-            - ./db/slave-node1/my.cnf:/etc/mysql/my.cnf
-        networks:
-            - net
-
-    slave-node2:
-        container_name: slave-node2
-        image: mysql:8.0.29
-        restart: always
-        environment:
-            MYSQL_DATABASE: ${MYSQL_DATABASE}
-            MYSQL_USER: ${MYSQL_USER}
-            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-        ports:
-            - '3304:3306'
-        volumes:
-            - slave-node2:/var/lib/mysql
-            - slave-node2:/var/lib/mysql-files
-            - ./db/slave-node2/my.cnf:/etc/mysql/my.cnf
-        networks:
-            - net
+            - redis-slave-data:/data
 
     goupang-auth:
         container_name: goupang-auth
@@ -83,9 +49,8 @@ services:
             - goupang-auth
 
 volumes:
-    master-node:
-    slave-node1:
-    slave-node2:
+    redis-master-data:
+    redis-slave-data:
 
 networks:
     net:
