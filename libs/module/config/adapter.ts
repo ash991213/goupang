@@ -2,20 +2,22 @@ export abstract class IEnvConfigService {
     NODE_ENV: string;
 
     LOG_LEVEL: string;
-    LOG_LEVEL_DB: string;
+    LOG_LEVEL_DB: string[];
 
-    MASTER_DATABASE: {
+    RDS_REGION: string;
+    DATABASE_NAME: string;
+    DATABASE_TYPE: string;
+
+    WRITE_DATABASE: {
         HOST: string;
         PORT: number;
         USER: string;
-        PASSWORD: string;
     };
 
-    SLAVE_DATABASE: {
+    READ_DATABASE: {
         HOST: string;
         PORT: number;
         USER: string;
-        PASSWORD: string;
     };
 
     PORT: {

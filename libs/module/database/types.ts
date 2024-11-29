@@ -1,16 +1,21 @@
-import { TypeormLoggerModule } from '@libs/module/database/typeorm-logger.module';
+import { TypeOrmLoggerModule } from '@libs/module/database/typeorm-logger.module';
 
-import { CONNECTION_NAME, DATABASE_TYPE } from '@libs/module/database/enum';
+export type GetAuthTokenParams = {
+    hostname: string;
+    port: number;
+    username: string;
+    region: string;
+};
 
 export type ConnectionModel = {
     name: string;
-    type: DATABASE_TYPE;
+    type: string;
     host: string;
     port: string | number;
     user: string;
     password: string;
-    database: CONNECTION_NAME;
+    database: string;
     entities: any[];
     logging: boolean;
-    logger: TypeormLoggerModule;
+    logger: TypeOrmLoggerModule;
 };

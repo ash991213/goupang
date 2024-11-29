@@ -12,20 +12,22 @@ export class EnvConfigService extends ConfigService implements IEnvConfigService
     NODE_ENV = this.get<string>('NODE_ENV');
 
     LOG_LEVEL = this.get<string>('LOG_LEVEL');
-    LOG_LEVEL_DB = this.get<string>('LOG_LEVEL_DB');
+    LOG_LEVEL_DB = this.get<string>('LOG_LEVEL_DB').split(',');
 
-    MASTER_DATABASE = {
-        HOST: this.get<string>('MASTER_MYSQL_HOST'),
-        PORT: this.get<number>('MASTER_MYSQL_PORT'),
-        USER: this.get<string>('MASTER_MYSQL_USERNAME'),
-        PASSWORD: this.get<string>('MASTER_MYSQL_PASSWORD'),
+    RDS_REGION = this.get<string>('RDS_REGION');
+    DATABASE_NAME = this.get<string>('DATABASE_NAME');
+    DATABASE_TYPE = this.get<string>('DATABASE_TYPE');
+
+    WRITE_DATABASE = {
+        HOST: this.get<string>('WRITE_DATABASE_HOST'),
+        PORT: this.get<number>('WRITE_DATABASE_PORT'),
+        USER: this.get<string>('WRITE_DATABASE_USER'),
     };
 
-    SLAVE_DATABASE = {
-        HOST: this.get<string>('SLAVE_MYSQL_HOST'),
-        PORT: this.get<number>('SLAVE_MYSQL_PORT'),
-        USER: this.get<string>('SLAVE_MYSQL_USERNAME'),
-        PASSWORD: this.get<string>('SLAVE_MYSQL_PASSWORD'),
+    READ_DATABASE = {
+        HOST: this.get<string>('READ_DATABASE_HOST'),
+        PORT: this.get<number>('READ_DATABASE_PORT'),
+        USER: this.get<string>('READ_DATABASE_USER'),
     };
 
     PORT = {

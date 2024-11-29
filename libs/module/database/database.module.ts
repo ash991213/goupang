@@ -1,43 +1,77 @@
-import { Module, DynamicModule, Provider } from '@nestjs/common';
+import { Module, Provider } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TypeormLoggerModule } from '@libs/module/database/typeorm-logger.module';
+import { TypeOrmLoggerModule } from '@libs/module/database/typeorm-logger.module';
+
+import { LogLevel } from 'typeorm';
+import { GetAuthTokenParams } from '@libs/module/database/types';
+
+import { DatabaseService } from '@libs/module/database/service';
+import { IDatabaseService } from '@libs/module/database/adapter';
 import { EnvConfigModule } from '@libs/module/config/config.module';
-
-import { DataBaseService } from '@libs/module/database/service';
-import { IDataBaseService } from '@libs/module/database/adapter';
 import { IEnvConfigService } from '@libs/module/config/adapter';
-
-import { DatabaseConnectionOptions } from '@libs/module/database/interface';
 
 @Module({})
 export class DatabaseModule {
-    static forRoot(connectionOptions: DatabaseConnectionOptions): DynamicModule {
-        const providers: Provider[] = [
-            {
-                provide: IDataBaseService,
-                useClass: DataBaseService,
-            },
-        ];
+    static forRootAsync(entities: any[]) {
+        const providers: Provider[] = [{ provide: IDatabaseService, useClass: DatabaseService }];
 
         return {
             module: DatabaseModule,
             imports: [
                 TypeOrmModule.forRootAsync({
-                    name: connectionOptions.name,
-                    imports: [EnvConfigModule],
-                    useFactory: async () => {
-                        const { name, type, host, port, user, password, database, entities, logging, logLevel } = connectionOptions;
-                        return new DataBaseService().getDefaultConnection({
-                            name,
-                            type,
-                            host,
-                            port,
-                            user,
-                            password,
-                            database,
-                            entities,
-                            logging,
-                            logger: new TypeormLoggerModule(logLevel),
+                    name: 'clusterEndpoint',
+                    imports: [EnvConfigModule.forRoot([])],
+                    useFactory: async (envConfigService: IEnvConfigService) => {
+                        const getAuthTokenParams: GetAuthTokenParams = {
+                            hostname: envConfigService.WRITE_DATABASE.HOST,
+                            port: envConfigService.WRITE_DATABASE.PORT,
+                            username: envConfigService.WRITE_DATABASE.USER,
+                            region: envConfigService.RDS_REGION,
+                        };
+                        const token = await new DatabaseService().getAuthToken(getAuthTokenParams);
+                        const logLevel = envConfigService.LOG_LEVEL_DB.map((v) => {
+                            return v as LogLevel;
+                        });
+                        return new DatabaseService().getDefaultConnection({
+                            name: envConfigService.DATABASE_NAME,
+                            type: envConfigService.DATABASE_TYPE,
+                            host: envConfigService.WRITE_DATABASE.HOST,
+                            port: envConfigService.WRITE_DATABASE.PORT,
+                            user: envConfigService.WRITE_DATABASE.USER,
+                            password: token,
+                            database: envConfigService.DATABASE_NAME,
+                            entities: entities,
+                            logging: true,
+                            logger: new TypeOrmLoggerModule(logLevel),
+                        });
+                    },
+                    inject: [IEnvConfigService],
+                }),
+                TypeOrmModule.forRootAsync({
+                    name: 'readerEndpoint',
+                    imports: [EnvConfigModule.forRoot([])],
+                    useFactory: async (envConfigService: IEnvConfigService) => {
+                        const getAuthTokenParams: GetAuthTokenParams = {
+                            hostname: envConfigService.READ_DATABASE.HOST,
+                            port: envConfigService.READ_DATABASE.PORT,
+                            username: envConfigService.READ_DATABASE.USER,
+                            region: envConfigService.RDS_REGION,
+                        };
+                        const token = await new DatabaseService().getAuthToken(getAuthTokenParams);
+                        const logLevel = envConfigService.LOG_LEVEL_DB.map((v) => {
+                            return v as LogLevel;
+                        });
+                        return new DatabaseService().getDefaultConnection({
+                            name: envConfigService.DATABASE_NAME,
+                            type: envConfigService.DATABASE_TYPE,
+                            host: envConfigService.READ_DATABASE.HOST,
+                            port: envConfigService.READ_DATABASE.PORT,
+                            user: envConfigService.READ_DATABASE.USER,
+                            password: token,
+                            database: envConfigService.DATABASE_NAME,
+                            entities: entities,
+                            logging: true,
+                            logger: new TypeOrmLoggerModule(logLevel),
                         });
                     },
                     inject: [IEnvConfigService],
