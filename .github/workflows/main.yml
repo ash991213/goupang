@@ -108,10 +108,26 @@ jobs:
 
             - name: Create .env.prod file
               run: |
-                  {
-                    echo ""
-                    echo ""
-                  } >> apps/${{ matrix.service }}/env/.env.prod
+                  echo ${{ secrets.COMMON_PROD_ENV }} >> libs/module/config/env/.env.prod
+
+                  if [ "${{ matrix.service }}" = "auth" ]; then
+                    echo ${{ secrets.AUTH_PROD_ENV }} >> apps/${{ matrix.service }}/config/env/.env.prod
+                  elif [ "${{ matrix.service }}" = "noti" ]; then
+                    echo ${{ secrets.NOTI_PROD_ENV }} >> apps/${{ matrix.service }}/config/env/.env.prod
+                  elif [ "${{ matrix.service }}" = "product" ]; then
+                    echo ${{ secrets.ORDER_PROD_ENV }} >> apps/${{ matrix.service }}/config/env/.env.prod
+                  elif [ "${{ matrix.service }}" = "product" ]; then
+                    echo ${{ secrets.PAYMENT_PROD_ENV }} >> apps/${{ matrix.service }}/config/env/.env.prod
+                  elif [ "${{ matrix.service }}" = "product" ]; then
+                    echo ${{ secrets.PRODUCT_PROD_ENV }} >> apps/${{ matrix.service }}/config/env/.env.prod
+                  elif [ "${{ matrix.service }}" = "product" ]; then
+                    echo ${{ secrets.SHIPMENT_PROD_ENV }} >> apps/${{ matrix.service }}/config/env/.env.prod
+                  elif [ "${{ matrix.service }}" = "product" ]; then
+                    echo ${{ secrets.USER_PROD_ENV }} >> apps/${{ matrix.service }}/config/env/.env.prod
+                  else
+                    echo "No specific secret found for service: ${{ matrix.service }}"
+                    exit 1
+                  fi
 
             - name: Build Docker image for ${{ matrix.service }}
               run: |
@@ -134,7 +150,6 @@ jobs:
                   cp apps/${{ matrix.service }}/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/${{ matrix.service }}/docker-compose.yml deployment_package/
                   cp apps/${{ matrix.service }}/nginx.conf deployment_package/
-                  cp apps/${{ matrix.service }}/env/.env.prod deployment_package/env/
                   cd deployment_package
                   zip -r ../deployment_package.zip .
                   cd ..
