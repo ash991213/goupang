@@ -148,7 +148,7 @@ jobs:
                   aws deploy create-deployment \
                   --deployment-config-name CodeDeployDefault.AllAtOnce \
                   --application-name ${{ env.CODE_DEPLOYMENT_NAME }} \
-                  --deployment-group-name --deployment-group-name goupang-${{ matrix.service }} \
+                  --deployment-group-name --deployment-group-name 'goupang-'${{ matrix.service }} \
                   --s3-location "bucket=$S3_BUCKET_NAME,key=${{ matrix.service }}/deployment_package.zip,bundleType=zip"
 
     create-pull-request:
