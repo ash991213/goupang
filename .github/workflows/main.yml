@@ -145,11 +145,10 @@ jobs:
 
             - name: Deploy to CodeDeploy
               run: |
-                  DEPLOYMENT_GROUP_NAME="goupang-${{ matrix.service }}"
                   aws deploy create-deployment \
                   --deployment-config-name CodeDeployDefault.AllAtOnce \
                   --application-name ${{ env.CODE_DEPLOYMENT_NAME }} \
-                  --deployment-group-name --deployment-group-name "$DEPLOYMENT_GROUP_NAME"  \
+                  --deployment-group-name goupang-${{ matrix.service }} \
                   --s3-location "bucket=$S3_BUCKET_NAME,key=${{ matrix.service }}/deployment_package.zip,bundleType=zip"
 
     create-pull-request:
