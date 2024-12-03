@@ -19,36 +19,21 @@ env:
     AWS_DEFAULT_REGION: ap-northeast-2
     S3_BUCKET_NAME: goupang-deploy-s3
     CODE_DEPLOYMENT_NAME: goupang-user
-    USER_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-user
-    NOTI_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-noti
-    AUTH_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-auth
-    HOST_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-host
-    ORDER_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-order
-    PAYMENT_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-payment
-    PRODUCT_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-product
-    SHIPMENT_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: goupang-shipment
 
 jobs:
     files-changed:
-        name: detect what files changed
+        name: Detect what files changed
         runs-on: ubuntu-20.04
         timeout-minutes: 3
         outputs:
-            auth: ${{steps.changes.outputs.auth}}
-            host: ${{steps.changes.outputs.host}}
-            noti: ${{steps.changes.outputs.noti}}
-            order: ${{steps.changes.outputs.order}}
-            payment: ${{steps.changes.outputs.payment}}
-            product: ${{steps.changes.outputs.product}}
-            shipment: ${{steps.changes.outputs.shipment}}
-            user: ${{steps.changes.outputs.user}}
+            services: ${{ steps.path-filter.outputs.changes }}
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
 
             - name: Check for services
               uses: dorny/paths-filter@v3
-              id: changes
+              id: path-filter
               with:
                   filters: |
                       auth: apps/auth/**
@@ -60,25 +45,17 @@ jobs:
                       shipment: apps/shipment/**
                       user: apps/user/**
 
-            - name: Debug paths-filter output
-              run: |
-                  echo "Auth changed: ${{ steps.changes.outputs.auth }}"
-                  echo "Host changed: ${{ steps.changes.outputs.host }}"
-                  echo "Noti changed: ${{ steps.changes.outputs.noti }}"
-                  echo "Order changed: ${{ steps.changes.outputs.order }}"
-                  echo "Payment changed: ${{ steps.changes.outputs.payment }}"
-                  echo "Product changed: ${{ steps.changes.outputs.product }}"
-                  echo "Shipment changed: ${{ steps.changes.outputs.shipment }}"
-                  echo "User changed: ${{ steps.changes.outputs.user }}"
-
-    user-tests:
-        if: ${{ github.event_name == 'push' && needs.files-changed.outputs.user == 'true' }}
+    test:
+        if: ${{ needs.files-changed.outputs.services != '[]' }}
+        name: Run tests for service
         needs: files-changed
-        name: Run Jest Tests
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                service: ${{ fromJSON(needs.files-changed.outputs.services) }}
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Set up Node.js
               uses: actions/setup-node@v3
@@ -91,24 +68,26 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: Run Jest tests
-              run: pnpm user test:coverage
+            - name: Run Jest tests for ${{ matrix.service }}
+              run: pnpm ${{ matrix.service }} test:coverage
 
             - name: Upload test coverage
               if: success()
               uses: actions/upload-artifact@v3
               with:
                   name: test-coverage
-                  path: apps/user/src/coverage
+                  path: apps/${{ matrix.service }}/src/coverage
 
-    user:
-        # if: ${{ needs.files-changed.outputs.user == 'true' && github.event.pull_request.merged == true }}
-        if: ${{ needs.user-tests.result == 'success' }}
-        needs: [files-changed, user-tests]
-        name: Build and push user Docker image
+    common-steps:
+        if: ${{ needs.test.result == 'success' && needs.files-changed.outputs.services != '[]' }}
+        name: Build Docker image and deploy with Code-Deploy
+        needs: [test, files-changed]
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                service: ${{ fromJSON(needs.files-changed.outputs.services) }}
         steps:
-            - name: Checkout repo
+            - name: Checkout repository
               uses: actions/checkout@v3
 
             - name: Configure AWS credentials
@@ -123,29 +102,26 @@ jobs:
             - name: Log in to Amazon ECR
               uses: aws-actions/amazon-ecr-login@v2
 
-            - name: Create ECR repository for user
+            - name: Create ECR repository for ${{ matrix.service }}
               run: |
-                  aws ecr create-repository --repository-name goupang/user || true
+                  aws ecr create-repository --repository-name goupang/${{ matrix.service }} || true
 
             - name: Create .env.prod file
               run: |
                   {
                     echo ""
-                    echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
-                    echo "MYSQL_USER=${{ secrets.MYSQL_USER }}"
-                    echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}"
-                    echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}"
-                  } >> apps/user/env/.env.prod
+                    echo ""
+                  } >> apps/${{ matrix.service }}/env/.env.prod
 
-            - name: Build Docker image for user
+            - name: Build Docker image for ${{ matrix.service }}
               run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
+                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/${{ matrix.service }}
                   IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=user --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/user/Dockerfile .
+                  docker build --no-cache --build-arg APP_ENV=${{ matrix.service }} --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/${{ matrix.service }}/Dockerfile .
 
             - name: Push Docker image to ECR
               run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/user
+                  REPO_NAME=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/goupang/${{ matrix.service }}
                   IMAGE_TAG=latest
                   docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
                   docker push $REPO_NAME:$IMAGE_TAG
@@ -154,754 +130,26 @@ jobs:
               run: |
                   mkdir -p deployment_package/scripts
                   mkdir -p deployment_package/env
-                  cp apps/user/appspec.yml deployment_package/
-                  cp apps/user/scripts/pull_and_run.sh deployment_package/scripts/
-                  cp apps/user/docker-compose.yml deployment_package/
-                  cp apps/user/nginx.conf deployment_package/
-                  cp apps/user/env/.env.prod deployment_package/env/
+                  cp apps/${{ matrix.service }}/appspec.yml deployment_package/
+                  cp apps/${{ matrix.service }}/scripts/pull_and_run.sh deployment_package/scripts/
+                  cp apps/${{ matrix.service }}/docker-compose.yml deployment_package/
+                  cp apps/${{ matrix.service }}/nginx.conf deployment_package/
+                  cp apps/${{ matrix.service }}/env/.env.prod deployment_package/env/
                   cd deployment_package
                   zip -r ../deployment_package.zip .
                   cd ..
 
             - name: Upload to S3
               run: |
-                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} deployment_package.zip s3://$S3_BUCKET_NAME/user/deployment_package.zip
+                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} deployment_package.zip s3://$S3_BUCKET_NAME/${{ matrix.service }}/deployment_package.zip
 
             - name: Deploy to CodeDeploy
               run: |
                   aws deploy create-deployment \
                   --deployment-config-name CodeDeployDefault.AllAtOnce \
                   --application-name ${{ env.CODE_DEPLOYMENT_NAME }} \
-                  --deployment-group-name ${{ env.USER_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-                  --s3-location "bucket=$S3_BUCKET_NAME,key=user/deployment_package.zip,bundleType=zip"
-
-    noti-tests:
-        if: ${{ github.event_name == 'push' && needs.files-changed.outputs.noti == 'true' }}
-        needs: files-changed
-        name: Run Jest Tests
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v3
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: '18.6.0'
-
-            - name: Install pnpm
-              run: npm install -g pnpm@8.15.3
-
-            - name: Install dependencies
-              run: pnpm install
-
-            - name: Run Jest tests
-              run: pnpm noti test:coverage
-
-            - name: Upload test coverage
-              if: success()
-              uses: actions/upload-artifact@v3
-              with:
-                  name: test-coverage
-                  path: apps/noti/src/coverage
-
-    noti:
-        # if: ${{ needs.files-changed.outputs.noti == 'true' && github.event.pull_request.merged == true }}
-        if: ${{ needs.noti-tests.result == 'success' }}
-        needs: [files-changed, noti-tests]
-        name: Build and push noti Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repo
-              uses: actions/checkout@v3
-
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                  role-to-assume: ${{ secrets.AWS_ROLE_NAME }}
-                  aws-region: ${{ env.AWS_DEFAULT_REGION }}
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v2
-
-            - name: Create ECR repository for noti
-              run: |
-                  aws ecr create-repository --repository-name goupang/noti || true
-
-            - name: Create .env.prod file
-              run: |
-                  {
-                    echo ""
-                    echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
-                    echo "MYSQL_USER=${{ secrets.MYSQL_USER }}"
-                    echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}"
-                    echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}"
-                  } >> apps/noti/env/.env.prod
-
-            - name: Build Docker image for noti
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/noti
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=noti --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/noti/Dockerfile .
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/noti
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-
-            - name: Create deployment package
-              run: |
-                  mkdir -p deployment_package/scripts
-                  mkdir -p deployment_package/env
-                  cp apps/noti/appspec.yml deployment_package/
-                  cp apps/noti/scripts/pull_and_run.sh deployment_package/scripts/
-                  cp apps/noti/docker-compose.yml deployment_package/
-                  cp apps/noti/nginx.conf deployment_package/
-                  cp apps/noti/env/.env.prod deployment_package/env/
-                  cd deployment_package
-                  zip -r ../deployment_package.zip .
-                  cd ..
-
-            - name: Upload to S3
-              run: |
-                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} deployment_package.zip s3://$S3_BUCKET_NAME/noti/deployment_package.zip
-
-            - name: Deploy to CodeDeploy
-              run: |
-                  aws deploy create-deployment \
-                  --deployment-config-name CodeDeployDefault.AllAtOnce \
-                  --application-name ${{ env.CODE_DEPLOYMENT_NAME }} \
-                  --deployment-group-name ${{ env.NOTI_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-                  --s3-location "bucket=$S3_BUCKET_NAME,key=noti/deployment_package.zip,bundleType=zip"
-
-    auth-tests:
-        if: ${{ github.event_name == 'push' && needs.files-changed.outputs.auth == 'true' }}
-        needs: files-changed
-        name: Run Jest Tests
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v3
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: '18.6.0'
-
-            - name: Install pnpm
-              run: npm install -g pnpm@8.15.3
-
-            - name: Install dependencies
-              run: pnpm install
-
-            - name: Run Jest tests
-              run: pnpm auth test:coverage
-
-            - name: Upload test coverage
-              if: success()
-              uses: actions/upload-artifact@v3
-              with:
-                  name: test-coverage
-                  path: apps/auth/src/coverage
-
-    auth:
-        # if: ${{ needs.files-changed.outputs.auth == 'true' && github.event.pull_request.merged == true }}
-        if: ${{ needs.auth-tests.result == 'success' }}
-        needs: [files-changed, auth-tests]
-        name: Build and push auth Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repo
-              uses: actions/checkout@v3
-
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                  role-to-assume: ${{ secrets.AWS_ROLE_NAME }}
-                  aws-region: ${{ env.AWS_DEFAULT_REGION }}
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v2
-
-            - name: Create ECR repository for auth
-              run: |
-                  aws ecr create-repository --repository-name goupang/auth || true
-
-            - name: Create .env.prod file
-              run: |
-                  {
-                    echo ""
-                    echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
-                    echo "MYSQL_USER=${{ secrets.MYSQL_USER }}"
-                    echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}"
-                    echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}"
-                  } >> apps/auth/env/.env.prod
-
-            - name: Build Docker image for auth
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/auth
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=auth --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/auth/Dockerfile .
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/auth
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-
-            - name: Create deployment package
-              run: |
-                  mkdir -p deployment_package/scripts
-                  mkdir -p deployment_package/env
-                  cp apps/auth/appspec.yml deployment_package/
-                  cp apps/auth/scripts/pull_and_run.sh deployment_package/scripts/
-                  cp apps/auth/docker-compose.yml deployment_package/
-                  cp apps/auth/nginx.conf deployment_package/
-                  cp apps/auth/env/.env.prod deployment_package/env/
-                  cd deployment_package
-                  zip -r ../deployment_package.zip .
-                  cd ..
-
-            - name: Upload to S3
-              run: |
-                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} deployment_package.zip s3://$S3_BUCKET_NAME/auth/deployment_package.zip
-
-            - name: Deploy to CodeDeploy
-              run: |
-                  aws deploy create-deployment \
-                  --deployment-config-name CodeDeployDefault.AllAtOnce \
-                  --application-name ${{ env.CODE_DEPLOYMENT_NAME }} \
-                  --deployment-group-name ${{ env.AUTH_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-                  --s3-location "bucket=$S3_BUCKET_NAME,key=auth/deployment_package.zip,bundleType=zip"
-
-    host-tests:
-        if: ${{ github.event_name == 'push' && needs.files-changed.outputs.host == 'true' }}
-        needs: files-changed
-        name: Run Jest Tests
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v3
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: '18.6.0'
-
-            - name: Install pnpm
-              run: npm install -g pnpm@8.15.3
-
-            - name: Install dependencies
-              run: pnpm install
-
-            - name: Run Jest tests
-              run: pnpm host test:coverage
-
-            - name: Upload test coverage
-              if: success()
-              uses: actions/upload-artifact@v3
-              with:
-                  name: test-coverage
-                  path: apps/host/src/coverage
-
-    host:
-        # if: ${{ needs.files-changed.outputs.host == 'true' && github.event.pull_request.merged == true }}
-        if: ${{ needs.host-tests.result == 'success' }}
-        needs: [files-changed, host-tests]
-        name: Build and push host Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repo
-              uses: actions/checkout@v3
-
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                  role-to-assume: ${{ secrets.AWS_ROLE_NAME }}
-                  aws-region: ${{ env.AWS_DEFAULT_REGION }}
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v2
-
-            - name: Create ECR repository for host
-              run: |
-                  aws ecr create-repository --repository-name goupang/host || true
-
-            - name: Create .env.prod file
-              run: |
-                  {
-                    echo ""
-                    echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
-                    echo "MYSQL_USER=${{ secrets.MYSQL_USER }}"
-                    echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}"
-                    echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}"
-                  } >> apps/host/env/.env.prod
-
-            - name: Build Docker image for host
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/host
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=host --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/host/Dockerfile .
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/host
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-
-            - name: Create deployment package
-              run: |
-                  mkdir -p deployment_package/scripts
-                  mkdir -p deployment_package/env
-                  cp apps/host/appspec.yml deployment_package/
-                  cp apps/host/scripts/pull_and_run.sh deployment_package/scripts/
-                  cp apps/host/docker-compose.yml deployment_package/
-                  cp apps/host/nginx.conf deployment_package/
-                  cp apps/host/env/.env.prod deployment_package/env/
-                  cd deployment_package
-                  zip -r ../deployment_package.zip .
-                  cd ..
-
-            - name: Upload to S3
-              run: |
-                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} deployment_package.zip s3://$S3_BUCKET_NAME/host/deployment_package.zip
-
-            - name: Deploy to CodeDeploy
-              run: |
-                  aws deploy create-deployment \
-                  --deployment-config-name CodeDeployDefault.AllAtOnce \
-                  --application-name ${{ env.CODE_DEPLOYMENT_NAME }} \
-                  --deployment-group-name ${{ env.HOST_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-                  --s3-location "bucket=$S3_BUCKET_NAME,key=host/deployment_package.zip,bundleType=zip"
-
-    order-tests:
-        if: ${{ github.event_name == 'push' && needs.files-changed.outputs.order == 'true' }}
-        needs: files-changed
-        name: Run Jest Tests
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v3
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: '18.6.0'
-
-            - name: Install pnpm
-              run: npm install -g pnpm@8.15.3
-
-            - name: Install dependencies
-              run: pnpm install
-
-            - name: Run Jest tests
-              run: pnpm order test:coverage
-
-            - name: Upload test coverage
-              if: success()
-              uses: actions/upload-artifact@v3
-              with:
-                  name: test-coverage
-                  path: apps/order/src/coverage
-
-    order:
-        # if: ${{ needs.files-changed.outputs.order == 'true' && github.event.pull_request.merged == true }}
-        if: ${{ needs.order-tests.result == 'success' }}
-        needs: [files-changed, order-tests]
-        name: Build and push order Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repo
-              uses: actions/checkout@v3
-
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                  role-to-assume: ${{ secrets.AWS_ROLE_NAME }}
-                  aws-region: ${{ env.AWS_DEFAULT_REGION }}
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v2
-
-            - name: Create ECR repository for order
-              run: |
-                  aws ecr create-repository --repository-name goupang/order || true
-
-            - name: Create .env.prod file
-              run: |
-                  {
-                    echo ""
-                    echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
-                    echo "MYSQL_USER=${{ secrets.MYSQL_USER }}"
-                    echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}"
-                    echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}"
-                  } >> apps/order/env/.env.prod
-
-            - name: Build Docker image for order
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/order
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=order --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/order/Dockerfile .
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/order
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-
-            - name: Create deployment package
-              run: |
-                  mkdir -p deployment_package/scripts
-                  mkdir -p deployment_package/env
-                  cp apps/order/appspec.yml deployment_package/
-                  cp apps/order/scripts/pull_and_run.sh deployment_package/scripts/
-                  cp apps/order/docker-compose.yml deployment_package/
-                  cp apps/order/nginx.conf deployment_package/
-                  cp apps/order/env/.env.prod deployment_package/env/
-                  cd deployment_package
-                  zip -r ../deployment_package.zip .
-                  cd ..
-
-            - name: Upload to S3
-              run: |
-                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} deployment_package.zip s3://$S3_BUCKET_NAME/order/deployment_package.zip
-
-            - name: Deploy to CodeDeploy
-              run: |
-                  aws deploy create-deployment \
-                  --deployment-config-name CodeDeployDefault.AllAtOnce \
-                  --application-name ${{ env.CODE_DEPLOYMENT_NAME }} \
-                  --deployment-group-name ${{ env.ORDER_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-                  --s3-location "bucket=$S3_BUCKET_NAME,key=order/deployment_package.zip,bundleType=zip"
-
-    payment-tests:
-        if: ${{ github.event_name == 'push' && needs.files-changed.outputs.payment == 'true' }}
-        needs: files-changed
-        name: Run Jest Tests
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v3
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: '18.6.0'
-
-            - name: Install pnpm
-              run: npm install -g pnpm@8.15.3
-
-            - name: Install dependencies
-              run: pnpm install
-
-            - name: Run Jest tests
-              run: pnpm payment test:coverage
-
-            - name: Upload test coverage
-              if: success()
-              uses: actions/upload-artifact@v3
-              with:
-                  name: test-coverage
-                  path: apps/payment/src/coverage
-
-    payment:
-        # if: ${{ needs.files-changed.outputs.payment == 'true' && github.event.pull_request.merged == true }}
-        if: ${{ needs.payment-tests.result == 'success' }}
-        needs: [files-changed, payment-tests]
-        name: Build and push payment Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repo
-              uses: actions/checkout@v3
-
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                  role-to-assume: ${{ secrets.AWS_ROLE_NAME }}
-                  aws-region: ${{ env.AWS_DEFAULT_REGION }}
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v2
-
-            - name: Create ECR repository for payment
-              run: |
-                  aws ecr create-repository --repository-name goupang/payment || true
-
-            - name: Create .env.prod file
-              run: |
-                  {
-                    echo ""
-                    echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
-                    echo "MYSQL_USER=${{ secrets.MYSQL_USER }}"
-                    echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}"
-                    echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}"
-                  } >> apps/payment/env/.env.prod
-
-            - name: Build Docker image for payment
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/payment
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=payment --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/payment/Dockerfile .
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/payment
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-
-            - name: Create deployment package
-              run: |
-                  mkdir -p deployment_package/scripts
-                  mkdir -p deployment_package/env
-                  cp apps/payment/appspec.yml deployment_package/
-                  cp apps/payment/scripts/pull_and_run.sh deployment_package/scripts/
-                  cp apps/payment/docker-compose.yml deployment_package/
-                  cp apps/payment/nginx.conf deployment_package/
-                  cp apps/payment/env/.env.prod deployment_package/env/
-                  cd deployment_package
-                  zip -r ../deployment_package.zip .
-                  cd ..
-
-            - name: Upload to S3
-              run: |
-                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} deployment_package.zip s3://$S3_BUCKET_NAME/payment/deployment_package.zip
-
-            - name: Deploy to CodeDeploy
-              run: |
-                  aws deploy create-deployment \
-                  --deployment-config-name CodeDeployDefault.AllAtOnce \
-                  --application-name ${{ env.CODE_DEPLOYMENT_NAME }} \
-                  --deployment-group-name ${{ env.PAYMENT_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-                  --s3-location "bucket=$S3_BUCKET_NAME,key=payment/deployment_package.zip,bundleType=zip"
-
-    product-tests:
-        if: ${{ github.event_name == 'push' && needs.files-changed.outputs.product == 'true' }}
-        needs: files-changed
-        name: Run Jest Tests
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v3
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: '18.6.0'
-
-            - name: Install pnpm
-              run: npm install -g pnpm@8.15.3
-
-            - name: Install dependencies
-              run: pnpm install
-
-            - name: Run Jest tests
-              run: pnpm product test:coverage
-
-            - name: Upload test coverage
-              if: success()
-              uses: actions/upload-artifact@v3
-              with:
-                  name: test-coverage
-                  path: apps/product/src/coverage
-
-    product:
-        # if: ${{ needs.files-changed.outputs.product == 'true' && github.event.pull_request.merged == true }}
-        if: ${{ needs.product-tests.result == 'success' }}
-        needs: [files-changed, product-tests]
-        name: Build and push product Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repo
-              uses: actions/checkout@v3
-
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                  role-to-assume: ${{ secrets.AWS_ROLE_NAME }}
-                  aws-region: ${{ env.AWS_DEFAULT_REGION }}
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v2
-
-            - name: Create ECR repository for product
-              run: |
-                  aws ecr create-repository --repository-name goupang/product || true
-
-            - name: Create .env.prod file
-              run: |
-                  {
-                    echo ""
-                    echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
-                    echo "MYSQL_USER=${{ secrets.MYSQL_USER }}"
-                    echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}"
-                    echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}"
-                  } >> apps/product/env/.env.prod
-
-            - name: Build Docker image for product
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/product
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=product --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/product/Dockerfile .
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/product
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-
-            - name: Create deployment package
-              run: |
-                  mkdir -p deployment_package/scripts
-                  mkdir -p deployment_package/env
-                  cp apps/product/appspec.yml deployment_package/
-                  cp apps/product/scripts/pull_and_run.sh deployment_package/scripts/
-                  cp apps/product/docker-compose.yml deployment_package/
-                  cp apps/product/nginx.conf deployment_package/
-                  cp apps/product/env/.env.prod deployment_package/env/
-                  cd deployment_package
-                  zip -r ../deployment_package.zip .
-                  cd ..
-
-            - name: Upload to S3
-              run: |
-                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} deployment_package.zip s3://$S3_BUCKET_NAME/product/deployment_package.zip
-
-            - name: Deploy to CodeDeploy
-              run: |
-                  aws deploy create-deployment \
-                  --deployment-config-name CodeDeployDefault.AllAtOnce \
-                  --application-name ${{ env.CODE_DEPLOYMENT_NAME }} \
-                  --deployment-group-name ${{ env.PRODUCT_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-                  --s3-location "bucket=$S3_BUCKET_NAME,key=product/deployment_package.zip,bundleType=zip"
-
-    shipment-tests:
-        if: ${{ github.event_name == 'push' && needs.files-changed.outputs.shipment == 'true' }}
-        needs: files-changed
-        name: Run Jest Tests
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v3
-
-            - name: Set up Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: '18.6.0'
-
-            - name: Install pnpm
-              run: npm install -g pnpm@8.15.3
-
-            - name: Install dependencies
-              run: pnpm install
-
-            - name: Run Jest tests
-              run: pnpm shipment test:coverage
-
-            - name: Upload test coverage
-              if: success()
-              uses: actions/upload-artifact@v3
-              with:
-                  name: test-coverage
-                  path: apps/shipment/src/coverage
-
-    shipment:
-        # if: ${{ needs.files-changed.outputs.shipment == 'true' && github.event.pull_request.merged == true }}
-        if: ${{ needs.shipment-tests.result == 'success' }}
-        needs: [files-changed, shipment-tests]
-        name: Build and push shipment Docker image
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repo
-              uses: actions/checkout@v3
-
-            - name: Configure AWS credentials
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                  role-to-assume: ${{ secrets.AWS_ROLE_NAME }}
-                  aws-region: ${{ env.AWS_DEFAULT_REGION }}
-
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v2
-
-            - name: Log in to Amazon ECR
-              uses: aws-actions/amazon-ecr-login@v2
-
-            - name: Create ECR repository for shipment
-              run: |
-                  aws ecr create-repository --repository-name goupang/shipment || true
-
-            - name: Create .env.prod file
-              run: |
-                  {
-                    echo ""
-                    echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}"
-                    echo "MYSQL_USER=${{ secrets.MYSQL_USER }}"
-                    echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}"
-                    echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}"
-                  } >> apps/shipment/env/.env.prod
-
-            - name: Build Docker image for shipment
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/shipment
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=shipment --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/shipment/Dockerfile .
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/shipment
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-
-            - name: Create deployment package
-              run: |
-                  mkdir -p deployment_package/scripts
-                  mkdir -p deployment_package/env
-                  cp apps/shipment/appspec.yml deployment_package/
-                  cp apps/shipment/scripts/pull_and_run.sh deployment_package/scripts/
-                  cp apps/shipment/docker-compose.yml deployment_package/
-                  cp apps/shipment/nginx.conf deployment_package/
-                  cp apps/shipment/env/.env.prod deployment_package/env/
-                  cd deployment_package
-                  zip -r ../deployment_package.zip .
-                  cd ..
-
-            - name: Upload to S3
-              run: |
-                  aws s3 cp --region ${{ env.AWS_DEFAULT_REGION }} deployment_package.zip s3://$S3_BUCKET_NAME/shipment/deployment_package.zip
-
-            - name: Deploy to CodeDeploy
-              run: |
-                  aws deploy create-deployment \
-                  --deployment-config-name CodeDeployDefault.AllAtOnce \
-                  --application-name ${{ env.CODE_DEPLOYMENT_NAME }} \
-                  --deployment-group-name ${{ env.SHIPMENT_CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-                  --s3-location "bucket=$S3_BUCKET_NAME,key=shipment/deployment_package.zip,bundleType=zip"
+                  --deployment-group-name --deployment-group-name goupang-${{ matrix.service }} \
+                  --s3-location "bucket=$S3_BUCKET_NAME,key=${{ matrix.service }}/deployment_package.zip,bundleType=zip"
 
     create-pull-request:
         if: ${{ github.event_name == 'push' }}
