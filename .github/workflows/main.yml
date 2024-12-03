@@ -49,7 +49,7 @@ jobs:
         if: ${{ needs.files-changed.outputs.services != '[]' }}
         name: Run tests for service
         needs: files-changed
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         strategy:
             matrix:
                 service: ${{ fromJSON(needs.files-changed.outputs.services) }}
@@ -82,7 +82,7 @@ jobs:
         if: ${{ needs.test.result == 'success' && needs.files-changed.outputs.services != '[]' }}
         name: Build Docker image and deploy with Code-Deploy
         needs: [test, files-changed]
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         strategy:
             matrix:
                 service: ${{ fromJSON(needs.files-changed.outputs.services) }}
@@ -145,16 +145,17 @@ jobs:
 
             - name: Deploy to CodeDeploy
               run: |
+                  echo "Deployment group name: goupang-${{ matrix.service }}"
                   aws deploy create-deployment \
                   --deployment-config-name CodeDeployDefault.AllAtOnce \
                   --application-name ${{ env.CODE_DEPLOYMENT_NAME }} \
-                  --deployment-group-name --deployment-group-name 'goupang-'${{ matrix.service }} \
+                  --deployment-group-name --deployment-group-name "goupang-${{ matrix.service }}" \
                   --s3-location "bucket=$S3_BUCKET_NAME,key=${{ matrix.service }}/deployment_package.zip,bundleType=zip"
 
     create-pull-request:
         if: ${{ github.event_name == 'push' }}
         name: Create Pull Request
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-20.04
         steps:
             - name: Checkout repository
               uses: actions/checkout@v3
