@@ -15,6 +15,7 @@ export class EnvConfigService extends ConfigService implements IEnvConfigService
     LOG_LEVEL_DB = this.get<string>('LOG_LEVEL_DB').split(',');
 
     RDS_REGION = this.get<string>('RDS_REGION');
+    RDS_HOST = this.get<string>('RDS_HOST');
     DATABASE_NAME = this.get<string>('DATABASE_NAME');
     DATABASE_TYPE = this.get<string>('DATABASE_TYPE');
 

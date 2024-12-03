@@ -27,12 +27,13 @@ export class DatabaseService implements IDatabaseService {
             type: config.type,
             host: config.host,
             port: config.port,
-            user: config.user,
+            username: config.username,
             password: config.password,
             database: config.database,
             entities: config.entities,
             logging: config.logging,
             logger: config.logger,
+            ssl: config.ssl,
         } as unknown as T;
     }
 }

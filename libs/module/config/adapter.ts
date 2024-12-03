@@ -5,6 +5,7 @@ export abstract class IEnvConfigService {
     LOG_LEVEL_DB: string[];
 
     RDS_REGION: string;
+    RDS_HOST: string;
     DATABASE_NAME: string;
     DATABASE_TYPE: string;
 

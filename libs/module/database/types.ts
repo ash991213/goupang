@@ -7,15 +7,20 @@ export type GetAuthTokenParams = {
     region: string;
 };
 
+export type MySqlSslOptions = {
+    ca: string | Buffer;
+};
+
 export type ConnectionModel = {
     name: string;
     type: string;
     host: string;
     port: string | number;
-    user: string;
+    username: string;
     password: string;
     database: string;
     entities: any[];
     logging: boolean;
     logger: TypeOrmLoggerModule;
+    ssl: MySqlSslOptions;
 };
