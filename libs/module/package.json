@@ -13,10 +13,11 @@
     },
     "license": "ISC",
     "dependencies": {
+        "@aws-sdk/rds-signer": "^3.699.0",
         "@nestjs/config": "^3.2.3",
         "@nestjs/typeorm": "^10.0.2",
         "luxon": "^3.4.4",
-        "redis": "^4.7.0",
-        "typeorm": "^0.3.20"
+        "mysql2": "^3.11.5",
+        "redis": "^4.7.0"
     }
 }

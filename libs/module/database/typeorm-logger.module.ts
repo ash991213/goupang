@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { AbstractLogger, LogLevel, LogMessage, LoggerOptions } from 'typeorm';
 
-export class TypeormLoggerModule extends AbstractLogger {
+export class TypeOrmLoggerModule extends AbstractLogger {
     private readonly logger = new Logger('TypeormLogger');
 
     constructor(options?: LoggerOptions) {

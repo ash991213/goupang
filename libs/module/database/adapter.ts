@@ -1,6 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { ConnectionModel } from '@libs/module/database/types';
+import { ConnectionModel, GetAuthTokenParams } from '@libs/module/database/types';
 
-export abstract class IDataBaseService {
+export abstract class IDatabaseService {
+    abstract getAuthToken(authTokenParams: GetAuthTokenParams): Promise<string>;
     abstract getDefaultConnection<T = TypeOrmModuleOptions>(options?: ConnectionModel): T;
 }

@@ -3,3 +3,6 @@
 
 # dotenv environment variable files
 /config/env
+
+# database environment variables
+/database/*.pem
