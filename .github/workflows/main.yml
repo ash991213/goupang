@@ -106,6 +106,39 @@ jobs:
               run: |
                   aws ecr create-repository --repository-name goupang/${{ matrix.service }} || true
 
+            - name: Copy .env.prod file
+              run: |
+                  case "${{ matrix.service }}" in
+                  "auth")
+                    ENV_VAR=${{ secrets.AUTH_PROD_ENV }}
+                    ;;
+                  "noti")
+                    ENV_VAR=${{ secrets.NOTI_PROD_ENV }}
+                    ;;
+                  "order")
+                    ENV_VAR=${{ secrets.ORDER_PROD_ENV }}
+                    ;;
+                  "payment")
+                    ENV_VAR=${{ secrets.PAYMENT_PROD_ENV }}
+                    ;;
+                  "product")
+                    ENV_VAR=${{ secrets.PRODUCT_PROD_ENV }}
+                    ;;
+                  "shipment")
+                    ENV_VAR=${{ secrets.SHIPMENT_PROD_ENV }}
+                    ;;
+                  "user")
+                    ENV_VAR=${{ secrets.USER_PROD_ENV }}
+                    ;;
+                  esac
+                  if [ -n "$ENV_VAR" ]; then
+                    {
+                      echo "$ENV_VAR"
+                      echo ""
+                      echo ${{ secrets.COMMON_PROD_ENV }}
+                    } >> apps/${{ matrix.service }}/env/.env.prod
+                  fi
+
             - name: Build Docker image for ${{ matrix.service }}
               run: |
                   REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/${{ matrix.service }}
@@ -122,40 +155,10 @@ jobs:
             - name: Create deployment package
               run: |
                   mkdir -p deployment_package/scripts
-                  mkdir -p deployment_package/apps/${{ matrix.service }}/config/env
-                  mkdir -p deployment_package/libs/module/config/env
                   cp apps/${{ matrix.service }}/appspec.yml deployment_package/
                   cp apps/${{ matrix.service }}/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/${{ matrix.service }}/docker-compose.yml deployment_package/
                   cp apps/${{ matrix.service }}/nginx.conf deployment_package/
-
-                  case "${{ matrix.service }}" in
-                    "auth")
-                      ENV_VAR=${{ secrets.AUTH_PROD_ENV }}
-                      ;;
-                    "noti")
-                      ENV_VAR=${{ secrets.NOTI_PROD_ENV }}
-                      ;;
-                    "order")
-                      ENV_VAR=${{ secrets.ORDER_PROD_ENV }}
-                      ;;
-                    "payment")
-                      ENV_VAR=${{ secrets.PAYMENT_PROD_ENV }}
-                      ;;
-                    "product")
-                      ENV_VAR=${{ secrets.PRODUCT_PROD_ENV }}
-                      ;;
-                    "shipment")
-                      ENV_VAR=${{ secrets.SHIPMENT_PROD_ENV }}
-                      ;;
-                    "user")
-                      ENV_VAR=${{ secrets.USER_PROD_ENV }}
-                      ;;
-                  esac
-                  if [ -n "$ENV_VAR" ]; then
-                    echo "$ENV_VAR" >> deployment_package/apps/${{ matrix.service }}/config/env/.env.prod
-                  fi
-                  echo ${{ secrets.COMMON_PROD_ENV }} >> deployment_package/libs/module/config/env/.env.prod
 
                   cd deployment_package
                   zip -r ../deployment_package.zip .
