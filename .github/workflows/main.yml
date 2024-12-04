@@ -108,39 +108,26 @@ jobs:
 
             - name: Copy .env.prod file
               run: |
-                  case "${{ matrix.service }}" in
-                  "auth")
-                    ENV_VAR=${{ secrets.AUTH_PROD_ENV }}
-                    ;;
-                  "noti")
-                    ENV_VAR=${{ secrets.NOTI_PROD_ENV }}
-                    ;;
-                  "order")
-                    ENV_VAR=${{ secrets.ORDER_PROD_ENV }}
-                    ;;
-                  "payment")
-                    ENV_VAR=${{ secrets.PAYMENT_PROD_ENV }}
-                    ;;
-                  "product")
-                    ENV_VAR=${{ secrets.PRODUCT_PROD_ENV }}
-                    ;;
-                  "shipment")
-                    ENV_VAR=${{ secrets.SHIPMENT_PROD_ENV }}
-                    ;;
-                  "user")
-                    ENV_VAR=${{ secrets.USER_PROD_ENV }}
-                    ;;
-                  esac
-
-                  echo "ENV_VAR value: $ENV_VAR"
-
-                  if [ -n "$ENV_VAR" ]; then
-                    {
-                      echo "$ENV_VAR"
-                      echo ""
-                      echo ${{ secrets.COMMON_PROD_ENV }}
-                    } >> apps/${{ matrix.service }}/env/.env.prod
+                  if [ "${{ matrix.service }}" = "auth" ]; then
+                    echo ${{ secrets.AUTH_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                  elif [ "${{ matrix.service }}" = "noti" ]; then
+                    echo ${{ secrets.NOTI_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                  elif [ "${{ matrix.service }}" = "product" ]; then
+                    echo ${{ secrets.ORDER_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                  elif [ "${{ matrix.service }}" = "product" ]; then
+                    echo ${{ secrets.PAYMENT_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                  elif [ "${{ matrix.service }}" = "product" ]; then
+                    echo ${{ secrets.PRODUCT_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                  elif [ "${{ matrix.service }}" = "product" ]; then
+                    echo ${{ secrets.SHIPMENT_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                  elif [ "${{ matrix.service }}" = "product" ]; then
+                    echo ${{ secrets.USER_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
                   fi
+
+                  {
+                    echo ""
+                    echo ${{ secrets.COMMON_PROD_ENV }}
+                  } >> apps/${{ matrix.service }}/env/.env.prod
 
             - name: Build Docker image for ${{ matrix.service }}
               run: |
