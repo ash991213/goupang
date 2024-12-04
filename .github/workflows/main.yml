@@ -131,6 +131,9 @@ jobs:
                     ENV_VAR=${{ secrets.USER_PROD_ENV }}
                     ;;
                   esac
+
+                  echo "ENV_VAR value: $ENV_VAR"
+
                   if [ -n "$ENV_VAR" ]; then
                     {
                       echo "$ENV_VAR"
