@@ -106,7 +106,33 @@ jobs:
               run: |
                   aws ecr create-repository --repository-name goupang/${{ matrix.service }} || true
 
-            - name: Create .env.prod file
+            - name: Build Docker image for ${{ matrix.service }}
+              run: |
+                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/${{ matrix.service }}
+                  IMAGE_TAG=latest
+                  docker build --no-cache --build-arg APP_ENV=${{ matrix.service }} --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/${{ matrix.service }}/Dockerfile .
+
+            - name: Push Docker image to ECR
+              run: |
+                  REPO_NAME=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/goupang/${{ matrix.service }}
+                  IMAGE_TAG=latest
+                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
+                  docker push $REPO_NAME:$IMAGE_TAG
+
+            - name: Create deployment package
+              run: |
+                  mkdir -p deployment_package/scripts
+                  mkdir -p deployment_package/apps/${{ matrix.service }}/env/
+                  mkdir -p deployment_package/libs/module/config/env/
+                  cp apps/${{ matrix.service }}/appspec.yml deployment_package/
+                  cp apps/${{ matrix.service }}/scripts/pull_and_run.sh deployment_package/scripts/
+                  cp apps/${{ matrix.service }}/docker-compose.yml deployment_package/
+                  cp apps/${{ matrix.service }}/nginx.conf deployment_package/
+                  cd deployment_package
+                  zip -r ../deployment_package.zip .
+                  cd ..
+
+            - name: Copy .env.prod file
               run: |
                   echo ${{ secrets.COMMON_PROD_ENV }} >> libs/module/config/env/.env.prod
 
@@ -128,31 +154,6 @@ jobs:
                     echo "No specific secret found for service: ${{ matrix.service }}"
                     exit 1
                   fi
-
-            - name: Build Docker image for ${{ matrix.service }}
-              run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/${{ matrix.service }}
-                  IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=${{ matrix.service }} --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/${{ matrix.service }}/Dockerfile .
-
-            - name: Push Docker image to ECR
-              run: |
-                  REPO_NAME=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/goupang/${{ matrix.service }}
-                  IMAGE_TAG=latest
-                  docker tag $REPO_NAME:$IMAGE_TAG $REPO_NAME:$IMAGE_TAG
-                  docker push $REPO_NAME:$IMAGE_TAG
-
-            - name: Create deployment package
-              run: |
-                  mkdir -p deployment_package/scripts
-                  mkdir -p deployment_package/env
-                  cp apps/${{ matrix.service }}/appspec.yml deployment_package/
-                  cp apps/${{ matrix.service }}/scripts/pull_and_run.sh deployment_package/scripts/
-                  cp apps/${{ matrix.service }}/docker-compose.yml deployment_package/
-                  cp apps/${{ matrix.service }}/nginx.conf deployment_package/
-                  cd deployment_package
-                  zip -r ../deployment_package.zip .
-                  cd ..
 
             - name: Upload to S3
               run: |
