@@ -128,32 +128,38 @@ jobs:
                   cp apps/${{ matrix.service }}/scripts/pull_and_run.sh deployment_package/scripts/
                   cp apps/${{ matrix.service }}/docker-compose.yml deployment_package/
                   cp apps/${{ matrix.service }}/nginx.conf deployment_package/
+
+                  case "${{ matrix.service }}" in
+                    "auth")
+                      ENV_VAR=${{ secrets.AUTH_PROD_ENV }}
+                      ;;
+                    "noti")
+                      ENV_VAR=${{ secrets.NOTI_PROD_ENV }}
+                      ;;
+                    "order")
+                      ENV_VAR=${{ secrets.ORDER_PROD_ENV }}
+                      ;;
+                    "payment")
+                      ENV_VAR=${{ secrets.PAYMENT_PROD_ENV }}
+                      ;;
+                    "product")
+                      ENV_VAR=${{ secrets.PRODUCT_PROD_ENV }}
+                      ;;
+                    "shipment")
+                      ENV_VAR=${{ secrets.SHIPMENT_PROD_ENV }}
+                      ;;
+                    "user")
+                      ENV_VAR=${{ secrets.USER_PROD_ENV }}
+                      ;;
+                  esac
+                  if [ -n "$ENV_VAR" ]; then
+                    echo "$ENV_VAR" >> deployment_package/apps/${{ matrix.service }}/config/env/.env.prod
+                  fi
+                  echo ${{ secrets.COMMON_PROD_ENV }} >> deployment_package/libs/module/config/env/.env.prod
+
                   cd deployment_package
                   zip -r ../deployment_package.zip .
                   cd ..
-
-            - name: Copy .env.prod file
-              run: |
-                  echo ${{ secrets.COMMON_PROD_ENV }} >> deployment_package/libs/module/config/env/.env.prod
-
-                  if [ "${{ matrix.service }}" = "auth" ]; then
-                    echo ${{ secrets.AUTH_PROD_ENV }} >> deployment_package/apps/${{ matrix.service }}/config/env/.env.prod
-                  elif [ "${{ matrix.service }}" = "noti" ]; then
-                    echo ${{ secrets.NOTI_PROD_ENV }} >> deployment_package/apps/${{ matrix.service }}/config/env/.env.prod
-                  elif [ "${{ matrix.service }}" = "product" ]; then
-                    echo ${{ secrets.ORDER_PROD_ENV }} >> deployment_package/apps/${{ matrix.service }}/config/env/.env.prod
-                  elif [ "${{ matrix.service }}" = "product" ]; then
-                    echo ${{ secrets.PAYMENT_PROD_ENV }} >> deployment_package/apps/${{ matrix.service }}/config/env/.env.prod
-                  elif [ "${{ matrix.service }}" = "product" ]; then
-                    echo ${{ secrets.PRODUCT_PROD_ENV }} >> deployment_package/apps/${{ matrix.service }}/config/env/.env.prod
-                  elif [ "${{ matrix.service }}" = "product" ]; then
-                    echo ${{ secrets.SHIPMENT_PROD_ENV }} >> deployment_package/apps/${{ matrix.service }}/config/env/.env.prod
-                  elif [ "${{ matrix.service }}" = "product" ]; then
-                    echo ${{ secrets.USER_PROD_ENV }} >> deployment_package/apps/${{ matrix.service }}/config/env/.env.prod
-                  else
-                    echo "No specific secret found for service: ${{ matrix.service }}"
-                    exit 1
-                  fi
 
             - name: Upload to S3
               run: |
