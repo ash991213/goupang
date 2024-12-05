@@ -127,7 +127,7 @@ jobs:
                   {
                     echo ""
                     echo ${{ secrets.COMMON_PROD_ENV }}
-                  } >> apps/${{ matrix.service }}/env/.env.prod
+                  } >> libs/module/config/env/.env.prod
 
             - name: Build Docker image for ${{ matrix.service }}
               run: |
