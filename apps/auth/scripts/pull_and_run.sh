@@ -3,7 +3,6 @@
 SERVICES=("goupang-auth" "nginx")
 
 SERVICE_NAME="goupang-auth"
-# ENV_FILE="/home/ubuntu/$SERVICE_NAME/env/.env.prod"
 DOCKER_COMPOSE_FILE="/home/ubuntu/$SERVICE_NAME/docker-compose.yml"
 IMAGE_PATH="262872842537.dkr.ecr.ap-northeast-2.amazonaws.com"
 IMAGE_NAME="$IMAGE_PATH/goupang/auth:latest"
