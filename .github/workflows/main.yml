@@ -108,6 +108,12 @@ jobs:
 
             - name: Copy .env.prod file
               run: |
+                  mkdir -p libs/module/config/env/
+                  {
+                    echo ""
+                    echo ${{ secrets.COMMON_PROD_ENV }}
+                  } >> libs/module/config/env/.env.prod
+
                   if [ "${{ matrix.service }}" = "auth" ]; then
                     echo ${{ secrets.AUTH_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
                     echo ${{ secrets.COMMON_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
@@ -124,12 +130,6 @@ jobs:
                   elif [ "${{ matrix.service }}" = "product" ]; then
                     echo ${{ secrets.USER_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
                   fi
-
-                  mkdir -p libs/module/config/env/
-                  {
-                    echo ""
-                    echo ${{ secrets.COMMON_PROD_ENV }}
-                  } >> libs/module/config/env/.env.prod
 
             - name: Build Docker image for ${{ matrix.service }}
               run: |

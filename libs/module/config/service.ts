@@ -12,7 +12,7 @@ export class EnvConfigService extends ConfigService implements IEnvConfigService
     NODE_ENV = this.get<string>('NODE_ENV');
 
     LOG_LEVEL = this.get<string>('LOG_LEVEL');
-    LOG_LEVEL_DB = this.get<string>('LOG_LEVEL_DB').split(',');
+    LOG_LEVEL_DB = this.get<string>('LOG_LEVEL_DB');
 
     RDS_REGION = this.get<string>('RDS_REGION');
     RDS_HOST = this.get<string>('RDS_HOST');

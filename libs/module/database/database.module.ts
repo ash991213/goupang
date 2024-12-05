@@ -28,7 +28,7 @@ export class DatabaseModule {
             };
             const token = await new DatabaseService().getAuthToken(getAuthTokenParams);
 
-            const logLevel = (envConfigService.LOG_LEVEL_DB || ['schema', 'query', 'error', 'warn', 'info', 'log', 'migration']).map((v) => v as LogLevel);
+            const logLevel = (envConfigService.LOG_LEVEL_DB.split(',') || ['schema', 'query', 'error', 'warn', 'info', 'log', 'migration']).map((v) => v as LogLevel);
 
             return new DatabaseService().getDefaultConnection({
                 name,
