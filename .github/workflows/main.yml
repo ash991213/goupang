@@ -110,6 +110,7 @@ jobs:
               run: |
                   if [ "${{ matrix.service }}" = "auth" ]; then
                     echo ${{ secrets.AUTH_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                    echo ${{ secrets.COMMON_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
                   elif [ "${{ matrix.service }}" = "noti" ]; then
                     echo ${{ secrets.NOTI_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
                   elif [ "${{ matrix.service }}" = "product" ]; then
