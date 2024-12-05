@@ -124,6 +124,7 @@ jobs:
                     echo ${{ secrets.USER_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
                   fi
 
+                  mkdir -p libs/module/config/env/
                   {
                     echo ""
                     echo ${{ secrets.COMMON_PROD_ENV }}
