@@ -138,9 +138,8 @@ jobs:
 
             - name: Push Docker image to ECR
               run: |
-                  REPO_NAME=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/goupang/${{ matrix.service }}
                   IMAGE_TAG=latest
-                  docker push $REPO_NAME:$IMAGE_TAG
+                  docker push goupang-${{ matrix.service }}:$IMAGE_TAG
 
             - name: Create deployment package
               run: |
