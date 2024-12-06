@@ -133,9 +133,8 @@ jobs:
 
             - name: Build Docker image for ${{ matrix.service }}
               run: |
-                  REPO_NAME=262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/${{ matrix.service }}
                   IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=${{ matrix.service }} --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/${{ matrix.service }}/Dockerfile .
+                  docker build --no-cache --build-arg APP_ENV=${{ matrix.service }} --build-arg NODE_ENV=prod -t $goupang-${{ matrix.service }}:$IMAGE_TAG -f apps/${{ matrix.service }}/Dockerfile .
 
             - name: Push Docker image to ECR
               run: |

@@ -1,4 +1,4 @@
-import { Module, Provider } from '@nestjs/common';
+import { DynamicModule, Module, Provider } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmLoggerModule } from '@libs/module/database/typeorm-logger.module';
 
@@ -15,7 +15,7 @@ import { join } from 'path';
 
 @Module({})
 export class DatabaseModule {
-    static forRootAsync(entities: any[]) {
+    static forRootAsync(entities: any[]): DynamicModule {
         const providers: Provider[] = [{ provide: IDatabaseService, useClass: DatabaseService }];
 
         const createDatabaseConnection = async (envConfigService: IEnvConfigService, endpointType: 'WRITE_DATABASE' | 'READ_DATABASE', name: string) => {
