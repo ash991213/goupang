@@ -134,12 +134,14 @@ jobs:
             - name: Build Docker image for ${{ matrix.service }}
               run: |
                   IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=${{ matrix.service }} --build-arg NODE_ENV=prod -t goupang-${{ matrix.service }}:$IMAGE_TAG -f apps/${{ matrix.service }}/Dockerfile .
+                  REPO_NAME=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/goupang/${{ matrix.service }}
+                  docker build --no-cache --build-arg APP_ENV=${{ matrix.service }} --build-arg NODE_ENV=prod -t $REPO_NAME:$IMAGE_TAG -f apps/${{ matrix.service }}/Dockerfile .
 
             - name: Push Docker image to ECR
               run: |
                   IMAGE_TAG=latest
-                  docker push goupang-${{ matrix.service }}:$IMAGE_TAG
+                  REPO_NAME=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/goupang/${{ matrix.service }}
+                  docker push $REPO_NAME:$IMAGE_TAG
 
             - name: Create deployment package
               run: |
