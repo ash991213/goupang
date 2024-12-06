@@ -108,27 +108,25 @@ jobs:
 
             - name: Copy .env.prod file
               run: |
+                  echo ${{ secrets.AUTH_PROD_ENV }}
+
                   mkdir -p libs/module/config/env/
-                  {
-                    echo ""
-                    echo ${{ secrets.COMMON_PROD_ENV }}
-                  } >> libs/module/config/env/.env.prod
+                  echo "${{ secrets.COMMON_PROD_ENV }}" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> libs/module/config/env/.env.prod
 
                   if [ "${{ matrix.service }}" = "auth" ]; then
-                    echo ${{ secrets.AUTH_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
-                    echo ${{ secrets.COMMON_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                    echo "${{ secrets.AUTH_PROD_ENV }}" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> apps/${{ matrix.service }}/env/.env.prod
                   elif [ "${{ matrix.service }}" = "noti" ]; then
-                    echo ${{ secrets.NOTI_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                    echo "${{ secrets.NOTI_PROD_ENV }}" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> apps/${{ matrix.service }}/env/.env.prod
                   elif [ "${{ matrix.service }}" = "product" ]; then
-                    echo ${{ secrets.ORDER_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                    echo "${{ secrets.ORDER_PROD_ENV }}" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> apps/${{ matrix.service }}/env/.env.prod
                   elif [ "${{ matrix.service }}" = "product" ]; then
-                    echo ${{ secrets.PAYMENT_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                    echo "${{ secrets.PAYMENT_PROD_ENV }}" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> apps/${{ matrix.service }}/env/.env.prod
                   elif [ "${{ matrix.service }}" = "product" ]; then
-                    echo ${{ secrets.PRODUCT_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                    echo "${{ secrets.PRODUCT_PROD_ENV }}" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> apps/${{ matrix.service }}/env/.env.prod
                   elif [ "${{ matrix.service }}" = "product" ]; then
-                    echo ${{ secrets.SHIPMENT_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                    echo "${{ secrets.SHIPMENT_PROD_ENV }}" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> apps/${{ matrix.service }}/env/.env.prod
                   elif [ "${{ matrix.service }}" = "product" ]; then
-                    echo ${{ secrets.USER_PROD_ENV }} >> apps/${{ matrix.service }}/env/.env.prod
+                    echo "${{ secrets.USER_PROD_ENV }}" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> apps/${{ matrix.service }}/env/.env.prod
                   fi
 
             - name: Build Docker image for ${{ matrix.service }}

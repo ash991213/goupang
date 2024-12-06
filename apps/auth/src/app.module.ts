@@ -4,8 +4,7 @@ import { EnvConfigModule } from '@libs/module/config/config.module';
 import { DatabaseModule } from '@libs/module/database/database.module';
 
 @Module({
-    // imports: [AuthModule, EnvConfigModule, DatabaseModule],
-    imports: [AuthModule],
+    imports: [AuthModule, EnvConfigModule, DatabaseModule],
     providers: [],
 })
 export class AppModule {}

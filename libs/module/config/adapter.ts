@@ -22,7 +22,14 @@ export abstract class IEnvConfigService {
     };
 
     PORT: {
+        AUTH_PORT: number;
+        HOST_PORT: number;
+        NOTI_PORT: number;
+        ORDER_PORT: number;
+        PAYMENT_PORT: number;
         PRODUCT_PORT: number;
+        SHIPMENT_PORT: number;
+        USER_PORT: number;
     };
 
     RPC_URL: {
