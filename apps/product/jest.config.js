@@ -24,5 +24,4 @@ module.exports = {
         },
     },
     coveragePathIgnorePatterns: ['main.ts', 'swagger.ts', 'node_modules', 'module.ts', 'interface.ts', 'coverage'],
-    // setupFilesAfterEnv: [''],
 };
