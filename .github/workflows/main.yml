@@ -134,7 +134,7 @@ jobs:
             - name: Build Docker image for ${{ matrix.service }}
               run: |
                   IMAGE_TAG=latest
-                  docker build --no-cache --build-arg APP_ENV=${{ matrix.service }} --build-arg NODE_ENV=prod -t $goupang-${{ matrix.service }}:$IMAGE_TAG -f apps/${{ matrix.service }}/Dockerfile .
+                  docker build --no-cache --build-arg APP_ENV=${{ matrix.service }} --build-arg NODE_ENV=prod -t goupang-${{ matrix.service }}:$IMAGE_TAG -f apps/${{ matrix.service }}/Dockerfile .
 
             - name: Push Docker image to ECR
               run: |
