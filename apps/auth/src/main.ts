@@ -6,6 +6,8 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     const configService = app.get(IEnvConfigService, { strict: false });
-    await app.listen(configService.PORT.PRODUCT_PORT);
+    console.log(configService.PORT.AUTH_PORT);
+    console.log(configService.NODE_ENV);
+    await app.listen(8000);
 }
 bootstrap();

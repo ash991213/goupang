@@ -12,7 +12,7 @@ export class EnvConfigService extends ConfigService implements IEnvConfigService
     NODE_ENV = this.get<string>('NODE_ENV');
 
     LOG_LEVEL = this.get<string>('LOG_LEVEL');
-    LOG_LEVEL_DB = this.get<string>('LOG_LEVEL_DB').split(',');
+    LOG_LEVEL_DB = this.get<string>('LOG_LEVEL_DB');
 
     RDS_REGION = this.get<string>('RDS_REGION');
     RDS_HOST = this.get<string>('RDS_HOST');
@@ -32,7 +32,14 @@ export class EnvConfigService extends ConfigService implements IEnvConfigService
     };
 
     PORT = {
-        PRODUCT_PORT: this.get<number>('PORT'),
+        AUTH_PORT: this.get<number>('AUTH_PORT'),
+        HOST_PORT: this.get<number>('HOST_PORT'),
+        NOTI_PORT: this.get<number>('NOTI_PORT'),
+        ORDER_PORT: this.get<number>('ORDER_PORT'),
+        PAYMENT_PORT: this.get<number>('PAYMENT_PORT'),
+        PRODUCT_PORT: this.get<number>('PRODUCT_PORT'),
+        SHIPMENT_PORT: this.get<number>('SHIPMENT_PORT'),
+        USER_PORT: this.get<number>('USER_PORT'),
     };
 
     RPC_URL = {
