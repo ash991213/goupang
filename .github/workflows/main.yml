@@ -108,6 +108,7 @@ jobs:
 
             - name: Copy .env.prod file
               run: |
+                  mkdir -p apps/${{ matrix.service }}/env/
                   mkdir -p libs/module/config/env/
                   echo '${{ secrets.COMMON_PROD_ENV }}' | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > libs/module/config/env/.env.prod
 
