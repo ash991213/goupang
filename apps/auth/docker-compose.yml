@@ -3,12 +3,8 @@ services:
         container_name: goupang-auth
         image: 262872842537.dkr.ecr.ap-northeast-2.amazonaws.com/goupang/auth:latest
         restart: always
-        ports:
-            - '8000:8000'
         networks:
             - net
-        extra_hosts:
-            - 'host.docker.internal:host-gateway'
 
     nginx:
         container_name: nginx
@@ -28,4 +24,4 @@ services:
 
 networks:
     net:
-        driver: bridge
+        driver: host
