@@ -108,10 +108,11 @@ jobs:
 
             - name: Copy .env.prod file
               run: |
-                  mkdir -p apps/${{ matrix.service }}/env/
                   mkdir -p libs/module/config/env/
+                  echo '${{ secrets.GOUPANG_PEM }}' > libs/module/database/goupang.pem
                   echo '${{ secrets.COMMON_PROD_ENV }}' | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > libs/module/config/env/.env.prod
 
+                  mkdir -p apps/${{ matrix.service }}/env/
                   if [ "${{ matrix.service }}" = "auth" ]; then
                     echo '${{ secrets.AUTH_PROD_ENV }}' | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > apps/${{ matrix.service }}/env/.env.prod
                   elif [ "${{ matrix.service }}" = "noti" ]; then
