@@ -4,8 +4,7 @@ RUN npm i -g pnpm
 
 WORKDIR /goupang-auth
 
-ADD ./apps/auth /goupang-auth/apps/auth
-ADD ./libs /goupang-auth/libs
+COPY . /goupang-auth
 
 RUN ls /goupang-auth -al
 
@@ -13,11 +12,6 @@ ARG APP_ENV
 ARG NODE_ENV
 ENV APP_ENV=${APP_ENV}
 ENV NODE_ENV=${NODE_ENV}
-
-COPY tsconfig.json .
-COPY tsconfig.build.json .
-COPY package.json .
-COPY pnpm-workspace.yaml .
 
 RUN pnpm i
 
