@@ -1,22 +1,27 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Unique, OneToMany } from 'typeorm';
+import { UserAddress } from '@apps/user/src/user/domain/entity/user-address.entity';
 
-@Entity({ name: 'user' })
-export class UserEntity {
-    @PrimaryGeneratedColumn({ type: 'int', comment: '회원 기본키' })
+@Entity('user')
+@Unique(['login_id'])
+export class User {
+    @PrimaryGeneratedColumn()
     user_id: number;
 
-    @Column({ type: 'varchar', comment: '회원 ID', length: 320, nullable: false })
+    @Column({ type: 'varchar', length: 320, nullable: false })
     login_id: string;
 
-    @Column({ type: 'varchar', comment: '회원 PW', length: 60, nullable: false })
+    @Column({ type: 'varchar', length: 60, nullable: false })
     password: string;
 
-    @Column({ type: 'varchar', comment: '회원 이름', length: 100, nullable: false })
+    @Column({ type: 'varchar', length: 100, nullable: false })
     user_name: string;
 
-    @CreateDateColumn({ type: 'datetime', comment: '생성 시간', nullable: false })
+    @CreateDateColumn({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
     created_at: Date;
 
-    @UpdateDateColumn({ type: 'datetime', comment: '변경 시간', nullable: false })
+    @UpdateDateColumn({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updated_at: Date;
+
+    @OneToMany(() => UserAddress, (address) => address.user)
+    addresses: UserAddress[];
 }
