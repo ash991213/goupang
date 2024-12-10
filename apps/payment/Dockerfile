@@ -2,34 +2,20 @@ FROM node:18-alpine AS base
 
 RUN npm i -g pnpm
 
-ADD . /app
-ADD . /app/apps/payment
-ADD . /app/libs
+WORKDIR /goupang-payment
 
-WORKDIR /app
+COPY . /goupang-payment
 
-RUN ls /app -al
+RUN ls /goupang-payment -al
 
 ARG APP_ENV
 ARG NODE_ENV
 ENV APP_ENV=${APP_ENV}
 ENV NODE_ENV=${NODE_ENV}
 
-COPY apps/payment ./apps/payment
-COPY libs/ ./libs
-COPY tsconfig.json .
-COPY package.json .
-
 RUN pnpm i
-
-RUN pnpm user i
 
 RUN pnpm run build:${APP_ENV}:${NODE_ENV}
 
-WORKDIR /app
-
-RUN ls /app -al
-
 EXPOSE 8000
-
 CMD ["sh", "-c", "pnpm start:${APP_ENV}:${NODE_ENV}"]

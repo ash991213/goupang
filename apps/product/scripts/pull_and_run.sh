@@ -3,7 +3,6 @@
 SERVICES=("goupang-product" "nginx")
 
 SERVICE_NAME="goupang-product"
-ENV_FILE="/home/ubuntu/$SERVICE_NAME/env/.env.prod"
 DOCKER_COMPOSE_FILE="/home/ubuntu/$SERVICE_NAME/docker-compose.yml"
 IMAGE_PATH="262872842537.dkr.ecr.ap-northeast-2.amazonaws.com"
 IMAGE_NAME="$IMAGE_PATH/goupang/product:latest"
@@ -32,18 +31,18 @@ for service in "${SERVICES[@]}"; do
         docker pull $IMAGE_NAME
 
         echo "Starting $SERVICE_NAME with the latest image..."
-        docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE up -d --build
+        docker compose -f $DOCKER_COMPOSE_FILE up -d --build
     else
         if docker ps -a --format '{{.Names}}' | grep $CONTAINER_NAME; then
             if ! docker ps --format '{{.Names}}' | grep $CONTAINER_NAME; then
                 echo "Service $service is not running. Restarting."
-                docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE up -d --force-recreate $service
+                docker compose -f $DOCKER_COMPOSE_FILE up -d --force-recreate $service
             else
                 echo "Service $service is already running. Skipping."
             fi
         else
             echo "Service $service is not present. Starting."
-            docker compose --env-file $ENV_FILE -f $DOCKER_COMPOSE_FILE up -d $service --build
+            docker compose -f $DOCKER_COMPOSE_FILE up -d $service --build
         fi
     fi
 done
