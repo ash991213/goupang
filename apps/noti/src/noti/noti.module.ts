@@ -5,7 +5,7 @@ import { EnvConfigModule } from '@libs/module/config/config.module';
 import { DatabaseModule } from '@libs/module/database/database.module';
 
 @Module({
-    imports: [EnvConfigModule.forRoot([`apps/auth/env/${process.env.NODE_ENV === 'prod' ? '.env.prod' : '.env.dev'}`]), DatabaseModule.forRootAsync([])],
+    imports: [EnvConfigModule.forRoot([`apps/noti/env/${process.env.NODE_ENV === 'prod' ? '.env.prod' : '.env.dev'}`]), DatabaseModule.forRootAsync([])],
     controllers: [NotiController],
     providers: [NotiService],
 })
