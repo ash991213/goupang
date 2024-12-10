@@ -6,7 +6,7 @@ import { OrderController } from './infrastructure/inbound/adapter/order.controll
 import { OrderService } from './infrastructure/inbound/port/order.service';
 
 @Module({
-    imports: [EnvConfigModule.forRoot([`apps/auth/env/${process.env.NODE_ENV === 'prod' ? '.env.prod' : '.env.dev'}`]), DatabaseModule.forRootAsync([])],
+    imports: [EnvConfigModule.forRoot([`apps/order/env/${process.env.NODE_ENV === 'prod' ? '.env.prod' : '.env.dev'}`]), DatabaseModule.forRootAsync([])],
     controllers: [OrderController],
     providers: [OrderService],
 })
