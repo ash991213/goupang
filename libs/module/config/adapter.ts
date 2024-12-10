@@ -1,6 +1,9 @@
 export abstract class IEnvConfigService {
     NODE_ENV: string;
 
+    AWS_ACCESS_KEY: string;
+    AWS_SECRET_KEY: string;
+
     LOG_LEVEL: string;
     LOG_LEVEL_DB: string;
 

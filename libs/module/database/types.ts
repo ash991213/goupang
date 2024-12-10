@@ -1,12 +1,5 @@
 import { TypeOrmLoggerModule } from '@libs/module/database/typeorm-logger.module';
 
-export type GetAuthTokenParams = {
-    hostname: string;
-    port: number;
-    username: string;
-    region: string;
-};
-
 export type MySqlSslOptions = {
     ca: string | Buffer;
 };

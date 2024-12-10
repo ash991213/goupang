@@ -2,25 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 import { IDatabaseService } from '@libs/module/database/adapter';
-import { ConnectionModel, GetAuthTokenParams } from '@libs/module/database/types';
+import { ConnectionModel } from '@libs/module/database/types';
 
-import { Signer } from '@aws-sdk/rds-signer';
+import { Signer, SignerConfig } from '@aws-sdk/rds-signer';
 
 @Injectable()
 export class DatabaseService implements IDatabaseService {
-    async getAuthToken(authTokenParams: GetAuthTokenParams): Promise<string> {
-        const { hostname, port, username, region } = authTokenParams;
-        const signer = new Signer({
-            hostname,
-            port,
-            username,
-            region,
-        });
-
+    async getAuthToken(signerConfig: SignerConfig): Promise<string> {
+        const signer = new Signer(signerConfig);
         const token = await signer.getAuthToken();
-
         return token;
     }
+
     getDefaultConnection<T extends TypeOrmModuleOptions = TypeOrmModuleOptions>(config: ConnectionModel): T {
         return {
             name: config.name,

@@ -11,6 +11,9 @@ export class EnvConfigService extends ConfigService implements IEnvConfigService
 
     NODE_ENV = this.get<string>('NODE_ENV');
 
+    AWS_ACCESS_KEY = this.get<string>('AWS_ACCESS_KEY');
+    AWS_SECRET_KEY = this.get<string>('AWS_SECRET_KEY');
+
     LOG_LEVEL = this.get<string>('LOG_LEVEL');
     LOG_LEVEL_DB = this.get<string>('LOG_LEVEL_DB');
 
