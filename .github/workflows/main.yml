@@ -116,7 +116,7 @@ jobs:
                   if [ "${{ matrix.service }}" = "auth" ]; then
                     echo '${{ secrets.AUTH_PROD_ENV }}' | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > apps/${{ matrix.service }}/env/.env.prod
                   elif [ "${{ matrix.service }}" = "host" ]; then
-                    echo '${{ secrets.NOTI_PROD_ENV }}' | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > apps/${{ matrix.service }}/env/.env.prod
+                    echo '${{ secrets.HOST_PROD_ENV }}' | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > apps/${{ matrix.service }}/env/.env.prod
                   elif [ "${{ matrix.service }}" = "noti" ]; then
                     echo '${{ secrets.NOTI_PROD_ENV }}' | jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' > apps/${{ matrix.service }}/env/.env.prod
                   elif [ "${{ matrix.service }}" = "order" ]; then
