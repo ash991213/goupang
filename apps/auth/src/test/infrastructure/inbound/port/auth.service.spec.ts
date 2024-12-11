@@ -17,6 +17,6 @@ describe('AuthService', () => {
     });
 
     it('should return "Auth Workflow Test!!"', () => {
-        expect(service.getHello()).toBe('Auth Workflow Test!');
+        expect(service.getHello()).toBe('Auth Workflow Test!!');
     });
 });
