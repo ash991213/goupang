@@ -4,7 +4,7 @@ import { User } from '@apps/user/src/user/domain/entity/user.entity';
 @Entity('user_address')
 export class UserAddress {
     @PrimaryGeneratedColumn()
-    address_id: number;
+    addressId: number;
 
     @Column({ type: 'int', nullable: false })
     user_id: number;
@@ -15,13 +15,13 @@ export class UserAddress {
     @Column({ type: 'boolean', default: false, nullable: false })
     is_default: boolean;
 
-    @CreateDateColumn({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+    @CreateDateColumn({ type: 'datetime', default: () => 'NOW()' })
     created_at: Date;
 
-    @UpdateDateColumn({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    @UpdateDateColumn({ type: 'datetime', default: () => 'NOW()', onUpdate: 'NOW()' })
     updated_at: Date;
 
-    @ManyToOne(() => User, (user) => user.addresses)
+    @ManyToOne(() => User, (user) => user.addresses, { nullable: false })
     @JoinColumn({ name: 'user_id' })
     user: User;
 }

@@ -16,10 +16,10 @@ export class User {
     @Column({ type: 'varchar', length: 100, nullable: false })
     user_name: string;
 
-    @CreateDateColumn({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+    @CreateDateColumn({ type: 'datetime', default: () => 'NOW()' })
     created_at: Date;
 
-    @UpdateDateColumn({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    @UpdateDateColumn({ type: 'datetime', default: () => 'NOW()', onUpdate: 'NOW()' })
     updated_at: Date;
 
     @OneToMany(() => UserAddress, (address) => address.user)

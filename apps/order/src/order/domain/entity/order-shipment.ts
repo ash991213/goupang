@@ -1,27 +1,27 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { OrderEntity } from '@apps/order/src/order/domain/entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Order } from '@apps/order/src/order/domain/entity';
 
-@Entity({ name: 'order_shipment' })
-export class OrderShipmentEntity {
-    @PrimaryGeneratedColumn({ type: 'int', comment: '주문 배송 기본키' })
+@Entity('order_shipment')
+export class OrderShipment {
+    @PrimaryGeneratedColumn()
     order_shipment_id: number;
 
-    @Column({ type: 'int', comment: '주문 기본키', nullable: false })
+    @Column({ type: 'int', nullable: false })
     order_id: number;
 
-    @Column({ type: 'int', comment: '배송 기본키', nullable: false })
+    @Column({ type: 'int', nullable: false })
     shipment_id: number;
 
-    @Column({ type: 'varchar', comment: '배송지 주소', length: 400, nullable: false })
+    @Column({ type: 'varchar', length: 400, nullable: false })
     shipment_address: string;
 
-    @Column({ type: 'varchar', comment: '배송지 실패 시 사유', length: 300, default: null, nullable: true })
-    shipment_message: string;
+    @Column({ type: 'varchar', length: 300, nullable: true, comment: '실패인 경우 사유 작성' })
+    shipment_message: string | null;
 
-    @Column({ type: 'varchar', comment: '배송 ID', length: 128, default: null, nullable: true })
-    shipment_transaction_id: string;
+    @Column({ type: 'varchar', length: 128, nullable: true, comment: '배송 시스템 처리 번호' })
+    shipment_transaction_id: string | null;
 
-    @ManyToOne(() => OrderEntity, (order) => order.order_shipment_entity)
-    @JoinColumn({ name: 'order_id', referencedColumnName: 'order_id' })
-    order_entity: OrderEntity;
+    @ManyToOne(() => Order, (order) => order.orderShipments)
+    @JoinColumn({ name: 'order_id' })
+    order: Order;
 }

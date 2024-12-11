@@ -1,38 +1,52 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { ProductReview } from '@apps/product/src/product/domain/entity/product-review.entity';
 import { PRODUCT_STATUS } from '@apps/product/src/product/domain/enum/product.enum';
 
-@Entity({ name: 'product' })
-export class ProductEntity {
-    @PrimaryGeneratedColumn({ type: 'int', comment: '상품 기본키' })
+@Entity('product')
+export class Product {
+    @PrimaryGeneratedColumn()
     product_id: number;
 
-    @Column({ type: 'int', comment: '호스트 기본키', nullable: false })
+    @Column({ type: 'int', nullable: false })
     host_id: number;
 
-    @Column({ type: 'varchar', comment: '상품 식별 코드', length: 9, nullable: false })
+    @Column({
+        type: 'varchar',
+        length: 9,
+        nullable: false,
+        comment: 'H${host_id}-P${product_id}, id는 각 3자리, ex: H001-P001',
+    })
     product_sku: string;
 
-    @Column({ type: 'varchar', comment: '상품 이름', length: 100, nullable: false })
+    @Column({ type: 'varchar', length: 100, nullable: false })
     product_name: string;
 
-    @Column({ type: 'text', comment: '상품 정보', nullable: true })
+    @Column({ type: 'text', nullable: false })
     product_content: string;
 
-    @Column({ type: 'decimal', comment: '상품 가격', nullable: false })
+    @Column({ type: 'decimal', precision: 12, scale: 2, default: 0, nullable: false })
     product_price: number;
 
-    @Column({ type: 'int', comment: '상품 재고', nullable: false })
-    product_stock: string;
+    @Column({ type: 'int', default: 0, nullable: false })
+    product_stock: number;
 
-    @Column({ type: 'enum', comment: '상품 상태', nullable: false })
+    @Column({
+        type: 'enum',
+        enum: PRODUCT_STATUS,
+        default: PRODUCT_STATUS.ACTIVE,
+        nullable: false,
+    })
     product_status: PRODUCT_STATUS;
 
-    @Column({ type: 'int', comment: '상품 리뷰 수', nullable: false })
+    @Column({ type: 'int', default: 0, nullable: false })
     review_count: number;
 
-    @CreateDateColumn({ type: 'datetime', comment: '생성 시간', nullable: false })
+    @CreateDateColumn({ type: 'datetime', default: () => 'NOW()' })
     created_at: Date;
 
-    @UpdateDateColumn({ type: 'datetime', comment: '변경 시간', nullable: false })
+    @UpdateDateColumn({ type: 'datetime', default: () => 'NOW()', onUpdate: 'NOW()' })
     updated_at: Date;
+
+    @OneToMany(() => ProductReview, (review) => review.product)
+    reviews: ProductReview[];
 }
