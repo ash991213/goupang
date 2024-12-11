@@ -1,32 +1,47 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Product } from '@apps/product/src/product/domain/entity/product.entity';
 import { REVIEW_STATUS } from '@apps/product/src/product/domain/enum/product.enum';
 
-@Entity({ name: 'product_review' })
-export class ProductReviewEntity {
-    @PrimaryGeneratedColumn({ type: 'int', comment: '상품 리뷰 기본키' })
+@Entity('product_review')
+export class ProductReview {
+    @PrimaryGeneratedColumn()
     review_id: number;
 
-    @Column({ type: 'int', comment: '상품 기본키', nullable: false })
+    @Column({ type: 'int', nullable: false })
     product_id: number;
 
-    @Column({ type: 'int', comment: '회원 기본키', nullable: false })
+    @Column({ type: 'int', nullable: false })
     user_id: number;
 
-    @Column({ type: 'varchar', comment: '리뷰 제목', length: 30, nullable: false })
+    @Column({ type: 'varchar', length: 30, nullable: false })
     review_title: string;
 
-    @Column({ type: 'varchar', comment: '리뷰 내용', length: 100, nullable: true })
-    review_content: string;
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    review_content: string | null;
 
-    @Column({ type: 'int', comment: '리뷰 점수', nullable: false })
+    @Column({
+        type: 'int',
+        default: 0,
+        nullable: false,
+        comment: '1 ~ 5 까지 정수',
+    })
     review_score: number;
 
-    @Column({ type: 'enum', comment: '리뷰 상태', nullable: false })
+    @Column({
+        type: 'enum',
+        enum: REVIEW_STATUS,
+        default: REVIEW_STATUS.ACTIVE,
+        nullable: false,
+    })
     review_status: REVIEW_STATUS;
 
-    @CreateDateColumn({ type: 'datetime', comment: '생성 시간', nullable: false })
+    @CreateDateColumn({ type: 'datetime', default: () => 'NOW()' })
     created_at: Date;
 
-    @UpdateDateColumn({ type: 'datetime', comment: '변경 시간', nullable: false })
+    @UpdateDateColumn({ type: 'datetime', default: () => 'NOW()', onUpdate: 'NOW()' })
     updated_at: Date;
+
+    @ManyToOne(() => Product, (product) => product.reviews)
+    @JoinColumn({ name: 'product_id' })
+    product: Product;
 }

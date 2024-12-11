@@ -1,6 +1,4 @@
-import { ViewEntity, ViewColumn, DataSource } from 'typeorm';
-
-import { OrderEntity, OrderAddressEntity, OrderProductEntity, OrderPaymentEntity, OrderShipmentEntity } from '@apps/order/src/order/domain/entity';
+import { DataSource, ViewColumn, ViewEntity } from 'typeorm';
 
 @ViewEntity({
     name: 'view_order_info',
@@ -11,7 +9,7 @@ import { OrderEntity, OrderAddressEntity, OrderProductEntity, OrderPaymentEntity
             .addSelect('order.order_date', 'order_date')
             .addSelect('order.order_price', 'order_price')
             .addSelect('order.order_status', 'order_status')
-            .addSelect('order_address.address', 'address')
+            .addSelect('order_address.address', 'order_address')
             .addSelect('order_product.product_sku', 'product_sku')
             .addSelect('order_product.product_name', 'product_name')
             .addSelect('order_product.product_price', 'product_price')
@@ -23,13 +21,13 @@ import { OrderEntity, OrderAddressEntity, OrderProductEntity, OrderPaymentEntity
             .addSelect('order_shipment.shipment_address', 'shipment_address')
             .addSelect('order_shipment.shipment_message', 'shipment_message')
             .addSelect('order_shipment.shipment_transaction_id', 'shipment_transaction_id')
-            .from(OrderEntity, 'order')
-            .leftJoin(OrderAddressEntity, 'order_address', 'order.id = order_address.order_id')
-            .leftJoin(OrderProductEntity, 'order_product', 'order.id = order_product.order_id')
-            .leftJoin(OrderPaymentEntity, 'order_payment', 'order.id = order_payment.order_id')
-            .leftJoin(OrderShipmentEntity, 'order_shipment', 'order.id = order_shipment.order_id'),
+            .from('order', 'order')
+            .leftJoin('order_address', 'order_address', 'order.order_id = order_address.order_id')
+            .leftJoin('order_product', 'order_product', 'order.order_id = order_product.order_id')
+            .leftJoin('order_payment', 'order_payment', 'order.order_id = order_payment.order_id')
+            .leftJoin('order_shipment', 'order_shipment', 'order.order_id = order_shipment.order_id'),
 })
-export class OrderInfoViewEntity {
+export class ViewOrderInfoEntity {
     @ViewColumn({ name: 'order_id' })
     order_id: number;
 
@@ -37,13 +35,13 @@ export class OrderInfoViewEntity {
     order_date: Date;
 
     @ViewColumn({ name: 'order_price' })
-    order_price: Date;
+    order_price: number;
 
     @ViewColumn({ name: 'order_status' })
-    order_status;
+    order_status: string;
 
-    @ViewColumn({ name: 'address' })
-    address: string;
+    @ViewColumn({ name: 'order_address' })
+    order_address: string;
 
     @ViewColumn({ name: 'product_sku' })
     product_sku: string;
@@ -61,7 +59,7 @@ export class OrderInfoViewEntity {
     payment_date: Date;
 
     @ViewColumn({ name: 'payment_price' })
-    payment_price: Date;
+    payment_price: number;
 
     @ViewColumn({ name: 'payment_message' })
     payment_message: string;

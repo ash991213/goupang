@@ -1,33 +1,33 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { OrderEntity } from '@apps/order/src/order/domain/entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Order } from '@apps/order/src/order/domain/entity';
 
-@Entity({ name: 'order_product' })
-export class OrderProductEntity {
-    @PrimaryGeneratedColumn({ type: 'int', comment: '주문 상품 기본키' })
+@Entity('order_product')
+export class OrderProduct {
+    @PrimaryGeneratedColumn()
     order_product_id: number;
 
-    @Column({ type: 'int', comment: '주문 기본키', nullable: false })
+    @Column({ type: 'int', nullable: false })
     order_id: number;
 
-    @Column({ type: 'int', comment: '점주 기본키', nullable: false })
+    @Column({ type: 'int', nullable: false })
     host_id: number;
 
-    @Column({ type: 'int', comment: '상품 기본키', nullable: false })
+    @Column({ type: 'int', nullable: false })
     product_id: number;
 
-    @Column({ type: 'varchar', comment: '상품 식별 코드', length: 9, nullable: false })
+    @Column({ type: 'varchar', length: 9, nullable: false, comment: 'H${host_id}-P${product_id}, id는 각 3자리, ex: H001-P001' })
     product_sku: string;
 
-    @Column({ type: 'varchar', comment: '상품 이름', length: 100, nullable: false })
+    @Column({ type: 'varchar', length: 100, nullable: false })
     product_name: string;
 
-    @Column({ type: 'decimal', comment: '상품 가격', nullable: false })
+    @Column({ type: 'decimal', precision: 12, scale: 2, default: 0, nullable: false })
     product_price: number;
 
-    @Column({ type: 'int', comment: '상품 수량', nullable: false })
+    @Column({ type: 'int', default: 0, nullable: false })
     product_quantity: number;
 
-    @ManyToOne(() => OrderEntity, (order) => order.order_product_entity)
-    @JoinColumn({ name: 'order_id', referencedColumnName: 'order_id' })
-    order_entity: OrderEntity;
+    @ManyToOne(() => Order, (order) => order.orderProducts)
+    @JoinColumn({ name: 'order_id' })
+    order: Order;
 }

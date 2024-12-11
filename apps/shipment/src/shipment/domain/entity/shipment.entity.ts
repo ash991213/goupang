@@ -1,35 +1,41 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { SHIPMENT_STATUS } from '@apps/shipment/src/shipment/domain/enum/shipment.enum';
 
-@Entity({ name: 'shipment' })
-export class ShipmentEntity {
-    @PrimaryGeneratedColumn({ type: 'int', comment: '배송 기본키' })
+@Entity('shipment')
+export class Shipment {
+    @PrimaryGeneratedColumn()
     shipment_id: number;
 
-    @Column({ type: 'varchar', comment: '배송지 주소', length: 400, nullable: false })
+    @Column({ type: 'varchar', length: 400, nullable: false })
     shipment_address: string;
 
-    @Column({ type: 'enum', comment: '배송 상태', nullable: false })
+    @Column({
+        type: 'enum',
+        enum: SHIPMENT_STATUS,
+        default: SHIPMENT_STATUS.PROCESSING,
+        nullable: false,
+        comment: 'processing: 배송 준비중, shipped: 발송함, delivered: 받음, cancelled: 배송 취소, returned: 반품',
+    })
     shipment_status: SHIPMENT_STATUS;
 
-    @Column({ type: 'varchar', comment: '배송지 실패 시 사유', length: 300, default: null, nullable: true })
-    shipment_message: string;
+    @Column({ type: 'varchar', length: 300, nullable: true, comment: '실패인 경우 사유 작성' })
+    shipment_message: string | null;
 
-    @Column({ type: 'varchar', comment: '배송 ID', length: 128, default: null, nullable: true })
-    shipment_transaction_id: string;
+    @Column({ type: 'varchar', length: 128, nullable: true, comment: '배송 시스템 처리 번호' })
+    shipment_transaction_id: string | null;
 
-    @CreateDateColumn({ type: 'datetime', comment: '배송 완료 날짜', default: null, nullable: true })
-    shipped_date: Date;
+    @Column({ type: 'datetime', nullable: true })
+    shipped_date: Date | null;
 
-    @CreateDateColumn({ type: 'datetime', comment: '예상 배송 날짜', default: null, nullable: true })
-    expected_delivery_date: Date;
+    @Column({ type: 'datetime', nullable: true })
+    expected_delivery_date: Date | null;
 
-    @CreateDateColumn({ type: 'datetime', comment: '실제 배송 날짜', default: null, nullable: true })
-    actual_delivery_date: Date;
+    @Column({ type: 'datetime', nullable: true })
+    actual_delivery_date: Date | null;
 
-    @CreateDateColumn({ type: 'datetime', comment: '생성 시간', nullable: false })
+    @CreateDateColumn({ type: 'datetime', default: () => 'NOW()' })
     created_at: Date;
 
-    @UpdateDateColumn({ type: 'datetime', comment: '변경 시간', nullable: false })
+    @UpdateDateColumn({ type: 'datetime', default: () => 'NOW()', onUpdate: 'NOW()' })
     updated_at: Date;
 }
