@@ -3,6 +3,6 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AuthService {
     getHello(): string {
-        return 'Auth Workflow Test!';
+        return 'Auth Workflow Test!!';
     }
 }

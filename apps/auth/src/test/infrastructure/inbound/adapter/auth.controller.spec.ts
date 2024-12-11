@@ -21,7 +21,7 @@ describe('AuthController', () => {
     });
 
     it('should return "Auth Workflow Test!!"', () => {
-        expect(authController.getHello()).toBe('Auth Workflow Test!');
+        expect(authController.getHello()).toBe('Auth Workflow Test!!');
         expect(authController.getHello()).toBe(authService.getHello());
     });
 });
