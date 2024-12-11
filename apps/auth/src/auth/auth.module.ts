@@ -8,8 +8,7 @@ import { AuthService } from '@apps/auth/src/auth/infrastructure/inbound/port/aut
 import { Auth } from '@apps/auth/src/auth/domain/entity/auth.entity';
 
 @Module({
-    // imports: [EnvConfigModule.forRoot([`apps/auth/env/${process.env.NODE_ENV === 'prod' ? '.env.prod' : '.env.dev'}`]), DatabaseModule.forRootAsync([Auth])],
-    imports: [EnvConfigModule.forRoot([`apps/auth/env/${process.env.NODE_ENV === 'prod' ? '.env.prod' : '.env.dev'}`]), DatabaseModule.forRootAsync([])],
+    imports: [EnvConfigModule.forRoot([`apps/auth/env/${process.env.NODE_ENV === 'prod' ? '.env.prod' : '.env.dev'}`]), DatabaseModule.forRootAsync([Auth])],
     controllers: [AuthController],
     providers: [AuthService],
 })
