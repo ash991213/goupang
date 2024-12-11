@@ -21,7 +21,7 @@ describe('HostController', () => {
     });
 
     it('should return "Host Workflow Test!!"', () => {
-        expect(hostController.getHello()).toBe('Host Workflow Test!!');
+        expect(hostController.getHello()).toBe('Host Workflow Test!');
         expect(hostController.getHello()).toBe(hostService.getHello());
     });
 });

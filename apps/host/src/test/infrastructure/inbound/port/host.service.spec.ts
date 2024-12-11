@@ -17,6 +17,6 @@ describe('HostService', () => {
     });
 
     it('should return "Host Workflow Test!!"', () => {
-        expect(service.getHello()).toBe('Host Workflow Test!!');
+        expect(service.getHello()).toBe('Host Workflow Test!');
     });
 });
