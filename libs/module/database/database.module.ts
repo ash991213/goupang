@@ -46,7 +46,7 @@ export class DatabaseModule {
                 logging: true,
                 logger: new TypeOrmLoggerModule(logLevel),
                 ssl: {
-                    ca: readFileSync(join(process.cwd(), 'libs/module/database/goupang.pem')),
+                    ca: readFileSync(join(process.cwd(), 'libs/module/database/ap-northeast-2-bundle.pem')),
                 },
             });
         };
