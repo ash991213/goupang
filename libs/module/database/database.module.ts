@@ -9,6 +9,7 @@ import { DatabaseService } from '@libs/module/database/service';
 import { IDatabaseService } from '@libs/module/database/adapter';
 import { EnvConfigModule } from '@libs/module/config/config.module';
 import { IEnvConfigService } from '@libs/module/config/adapter';
+import { EnvConfigService } from '@libs/module/config/service';
 
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -54,14 +55,17 @@ export class DatabaseModule {
         return {
             module: DatabaseModule,
             imports: [
+                EnvConfigModule.forRoot([]),
                 TypeOrmModule.forRootAsync({
                     name: 'clusterEndpoint',
+                    extraProviders: [EnvConfigService],
                     imports: [EnvConfigModule.forRoot([])],
                     useFactory: async (envConfigService: IEnvConfigService) => createDatabaseConnection(envConfigService, 'WRITE_DATABASE', 'clusterEndpoint'),
                     inject: [IEnvConfigService],
                 }),
                 TypeOrmModule.forRootAsync({
                     name: 'readerEndpoint',
+                    extraProviders: [EnvConfigService],
                     imports: [EnvConfigModule.forRoot([])],
                     useFactory: async (envConfigService: IEnvConfigService) => createDatabaseConnection(envConfigService, 'READ_DATABASE', 'readerEndpoint'),
                     inject: [IEnvConfigService],

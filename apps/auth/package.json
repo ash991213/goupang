@@ -13,6 +13,7 @@
         "email": "ansuhwan215@gmail.com"
     },
     "license": "ISC",
-    "dependencies": {},
-    "devDependencies": {}
+    "dependencies": {
+        "@nestjs/microservices": "^10.4.15"
+    }
 }
