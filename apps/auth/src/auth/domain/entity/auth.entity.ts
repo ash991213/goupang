@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+
 import { AUTH_ROLE } from '@apps/auth/src/auth/domain/enum/auth.enum';
 
 @Entity('auth')
