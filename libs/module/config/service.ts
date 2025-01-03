@@ -50,4 +50,13 @@ export class EnvConfigService extends ConfigService implements IEnvConfigService
     };
 
     REDIS_URL = this.get<string>('REDIS_URL');
+
+    KAFKA = {
+        BROKER_ENDPOINT: this.get<string>('KAFKA_BROKER_ENDPOINT'),
+        SASL_MECHANISMS: this.get<string>('KAFKA_SASL_MECHANISMS'),
+        SASL_PLAIN_USERNAME: this.get<string>('KAFKA_SASL_PLAIN_USERNAME'),
+        SASL_PLAIN_PASSWORD: this.get<string>('KAFKA_SASL_PLAIN_PASSWORD'),
+        CLIENT_ID: this.get<string>('KAFKA_CLIENT_ID'),
+        CONSUMER_GROUP_ID: this.get<string>('KAFKA_CONSUMER_GROUP_ID'),
+    };
 }

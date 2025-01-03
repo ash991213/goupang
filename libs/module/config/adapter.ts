@@ -40,4 +40,13 @@ export abstract class IEnvConfigService {
     };
 
     REDIS_URL: string;
+
+    KAFKA: {
+        BROKER_ENDPOINT: string;
+        SASL_MECHANISMS: string;
+        SASL_PLAIN_USERNAME: string;
+        SASL_PLAIN_PASSWORD: string;
+        CLIENT_ID: string;
+        CONSUMER_GROUP_ID: string;
+    };
 }
