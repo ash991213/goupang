@@ -10,9 +10,9 @@ IMAGE_NAME="$IMAGE_PATH/goupang/product:latest"
 LOGIN_CMD="aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $IMAGE_PATH"
 
 echo "Starting port forwarding session..."
-aws ssm start-session --target i-09804f764094172a5 \
+screen -dmS ssm-session aws ssm start-session --target i-09804f764094172a5 \
     --document-name AWS-StartPortForwardingSessionToRemoteHost \
-    --parameters '{"portNumber":["3306"],"localPortNumber":["3306"],"host":["aurora-mysql-test.cluster-cxmcrhm7hacy.ap-northeast-2.rds.amazonaws.com"]}' &
+    --parameters '{"portNumber":["3306"],"localPortNumber":["3306"],"host":["aurora-mysql-test.cluster-cxmcrhm7hacy.ap-northeast-2.rds.amazonaws.com"]}'
 
 for service in "${SERVICES[@]}"; do
     CONTAINER_NAME="${service}"
