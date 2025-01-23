@@ -55,7 +55,6 @@ export class DatabaseModule {
         return {
             module: DatabaseModule,
             imports: [
-                EnvConfigModule.forRoot([]),
                 TypeOrmModule.forRootAsync({
                     name: 'clusterEndpoint',
                     extraProviders: [EnvConfigService],

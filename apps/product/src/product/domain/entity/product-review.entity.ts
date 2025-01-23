@@ -44,4 +44,12 @@ export class ProductReview {
     @ManyToOne(() => Product, (product) => product.reviews)
     @JoinColumn({ name: 'product_id' })
     product: Product;
+
+    constructor(product_id: number, user_id: number, review_title: string, review_content: string, review_score: number) {
+        this.product_id = product_id;
+        this.user_id = user_id;
+        this.review_title = review_title;
+        this.review_content = review_content;
+        this.review_score = review_score;
+    }
 }
