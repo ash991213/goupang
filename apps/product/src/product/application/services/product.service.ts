@@ -5,16 +5,38 @@ import { IProductRepository } from '@apps/product/src/product/infrastructure/out
 
 import { CreateProductInnerDto } from '@apps/product/src/product/application/dtos/product.dto';
 
+import { ResException } from '@libs/util/res/res.exception';
+import { PRODUCT_CREATE_FAILED, PRODUCT_NOT_FOUND, PRODUCT_NOT_FOUND_BY_HOST_ID, PRODUCT_SELECT_FAILED } from '@libs/util/const/error.const';
+
 @Injectable()
 export class ProductService implements IProductService {
     constructor(private readonly productRepository: IProductRepository) {}
 
+    async getProductDetail(productId: number) {
+        try {
+            const productDetail = await this.productRepository.getProductDetail(productId);
+            if (!productDetail) throw new ResException(PRODUCT_NOT_FOUND);
+            return productDetail;
+        } catch (e) {
+            if (e instanceof ResException) throw e;
+            throw new ResException(PRODUCT_SELECT_FAILED);
+        }
+    }
+
     async generateProductSku(hostId: number): Promise<string> {
-        const productCount = await this.productRepository.getProductCountByHostId(hostId);
-        return `H${hostId}-P${productCount + 1}`;
+        try {
+            const productCount = await this.productRepository.getProductCountByHostId(hostId);
+            return `H${hostId}-P${productCount + 1}`;
+        } catch (e) {
+            throw new ResException(PRODUCT_NOT_FOUND_BY_HOST_ID);
+        }
     }
 
     async createProduct(newProduct: CreateProductInnerDto) {
-        return this.productRepository.createProduct(newProduct);
+        try {
+            return await this.productRepository.createProduct(newProduct);
+        } catch (e) {
+            throw new ResException(PRODUCT_CREATE_FAILED);
+        }
     }
 }

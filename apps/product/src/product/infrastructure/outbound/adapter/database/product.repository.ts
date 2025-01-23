@@ -22,8 +22,14 @@ export class ProductRepository implements IProductRepository {
         this.slaveProductRepository = this.slaveDataSource.getRepository(Product);
     }
 
+    async getProductDetail(productId: number): Promise<Product> {
+        return await this.slaveProductRepository.findOne({
+            where: { product_id: productId },
+        });
+    }
+
     async getProductCountByHostId(hostId: number) {
-        return this.slaveProductRepository.count({
+        return await this.slaveProductRepository.count({
             where: { host_id: hostId },
         });
     }

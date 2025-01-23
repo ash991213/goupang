@@ -15,11 +15,12 @@ import { ProduceService } from '@apps/product/src/product/infrastructure/outboun
 import { Product } from '@apps/product/src/product/domain/entity/product.entity';
 import { ProductReview } from '@apps/product/src/product/domain/entity/product-review.entity';
 
+import { GetProductDetailQueryHandler } from '@apps/product/src/product/application/queryHandler/product-detail.query.handler';
 import { CreateProductCommandHandler } from '@apps/product/src/product/application/commandHandler/create-product.command.handler';
 import { NotifyAdminProductCreationCommandHandler } from '@apps/product/src/product/application/commandHandler/notify-admin-product-creation.command.handler';
 import { CreateProductSaga } from '@apps/product/src/product/application/saga/create-product.saga';
 
-const CommandHandlers = [CreateProductCommandHandler, NotifyAdminProductCreationCommandHandler];
+const CommandHandlers = [GetProductDetailQueryHandler, CreateProductCommandHandler, NotifyAdminProductCreationCommandHandler];
 const Sagas = [CreateProductSaga];
 
 @Module({
