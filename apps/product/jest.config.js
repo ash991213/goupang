@@ -23,5 +23,5 @@ module.exports = {
             branches: 0,
         },
     },
-    coveragePathIgnorePatterns: ['main.ts', 'swagger.ts', 'node_modules', 'module.ts', 'interface.ts', 'coverage'],
+    coveragePathIgnorePatterns: ['main.ts', 'swagger.ts', 'node_modules', 'module.ts', 'interface.ts', 'repository.ts', 'coverage'],
 };

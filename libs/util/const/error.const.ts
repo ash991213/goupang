@@ -43,6 +43,6 @@ export const AUTH_JWT_EXPIRED: Res = { code: 3013, message: '만료된 JWT 토�
 
 // * product
 export const PRODUCT_NOT_FOUND: Res = { code: 4001, message: '상품을 찾을 수 없습니다.' };
-export const PRODUCT_NOT_FOUND_BY_HOST_ID: Res = { code: 4002, message: '호스트 ID로 상품을 찾을 수 없습니다.' };
-export const PRODUCT_SELECT_FAILED: Res = { code: 4003, message: '상품 조회에 실패했습니다.' };
+export const PRODUCT_SELECT_FAILED: Res = { code: 4002, message: '상품 조회에 실패했습니다.' };
+export const PRODUCT_SELECT_FAILED_BY_HOST_ID: Res = { code: 4003, message: '호스트 ID로 상품을 찾을 수 없습니다.' };
 export const PRODUCT_CREATE_FAILED: Res = { code: 4004, message: '상품 생성에 실패했습니다.' };

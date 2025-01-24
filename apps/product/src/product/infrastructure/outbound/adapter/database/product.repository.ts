@@ -28,7 +28,7 @@ export class ProductRepository implements IProductRepository {
         });
     }
 
-    async getProductCountByHostId(hostId: number) {
+    async getProductCountByHostId(hostId: number): Promise<number> {
         return await this.slaveProductRepository.count({
             where: { host_id: hostId },
         });

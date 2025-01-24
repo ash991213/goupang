@@ -6,7 +6,7 @@ import { KafkaModule } from '@libs/module/kafka/kafka.module';
 
 import { ProductController } from '@apps/product/src/product/infrastructure/inbound/adapter/rest/product.controller';
 import { IProductService } from '@apps/product/src/product/infrastructure/inbound/port/rest/product.service.interface';
-import { ProductService } from '@apps/product/src/product/application/services/product.service';
+import { ProductService } from '@apps/product/src/product/application/service/product.service';
 import { IProductRepository } from '@apps/product/src/product/infrastructure/outbound/port/repository/product.repository.interface';
 import { ProductRepository } from '@apps/product/src/product/infrastructure/outbound/adapter/database/product.repository';
 import { IProduceService } from '@apps/product/src/product/infrastructure/outbound/port/messageQueue/product.produce.interface';

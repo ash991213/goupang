@@ -6,7 +6,7 @@ import { IProductRepository } from '@apps/product/src/product/infrastructure/out
 import { CreateProductInnerDto } from '@apps/product/src/product/application/dtos/product.dto';
 
 import { ResException } from '@libs/util/res/res.exception';
-import { PRODUCT_CREATE_FAILED, PRODUCT_NOT_FOUND, PRODUCT_NOT_FOUND_BY_HOST_ID, PRODUCT_SELECT_FAILED } from '@libs/util/const/error.const';
+import { PRODUCT_CREATE_FAILED, PRODUCT_NOT_FOUND, PRODUCT_SELECT_FAILED, PRODUCT_SELECT_FAILED_BY_HOST_ID } from '@libs/util/const/error.const';
 
 @Injectable()
 export class ProductService implements IProductService {
@@ -28,7 +28,7 @@ export class ProductService implements IProductService {
             const productCount = await this.productRepository.getProductCountByHostId(hostId);
             return `H${hostId}-P${productCount + 1}`;
         } catch (e) {
-            throw new ResException(PRODUCT_NOT_FOUND_BY_HOST_ID);
+            throw new ResException(PRODUCT_SELECT_FAILED_BY_HOST_ID);
         }
     }
 
