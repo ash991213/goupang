@@ -1,9 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { AggregateRoot } from '@nestjs/cqrs';
 import { ProductReview } from '@apps/product/src/product/domain/entity/product-review.entity';
 import { PRODUCT_STATUS } from '@apps/product/src/product/domain/enum/product.enum';
+import { CreateProductEvent } from '@apps/product/src/product/application/events/create-product.event';
 
 @Entity('product')
-export class Product {
+export class Product extends AggregateRoot {
     @PrimaryGeneratedColumn()
     product_id: number;
 
@@ -12,9 +14,9 @@ export class Product {
 
     @Column({
         type: 'varchar',
-        length: 9,
+        length: 50,
         nullable: false,
-        comment: 'H${host_id}-P${product_id}, id는 각 3자리, ex: H001-P001',
+        comment: 'H${host_id}-P${product_id}, ex: H1-P1',
     })
     product_sku: string;
 
@@ -24,16 +26,16 @@ export class Product {
     @Column({ type: 'text', nullable: false })
     product_content: string;
 
-    @Column({ type: 'decimal', precision: 12, scale: 2, default: 0, nullable: false })
+    @Column({ type: 'decimal', precision: 12, scale: 2, nullable: false })
     product_price: number;
 
-    @Column({ type: 'int', default: 0, nullable: false })
+    @Column({ type: 'int', nullable: false })
     product_stock: number;
 
     @Column({
         type: 'enum',
         enum: PRODUCT_STATUS,
-        default: PRODUCT_STATUS.ACTIVE,
+        default: PRODUCT_STATUS.PENDING,
         nullable: false,
     })
     product_status: PRODUCT_STATUS;
@@ -49,4 +51,8 @@ export class Product {
 
     @OneToMany(() => ProductReview, (review) => review.product)
     reviews: ProductReview[];
+
+    createProduct() {
+        this.apply(new CreateProductEvent(this));
+    }
 }
